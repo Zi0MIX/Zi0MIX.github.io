@@ -34,6 +34,12 @@ arguments: {
 Refer to [this](https://github.com/Zi0MIX/ZM-RoundCalculator/blob/main/ARGUMENTS.MD) document for argument explanation.
 
 ## Output variants:
+General
+
+| Arguments | Structure |
+| --- | --- |
+| `-b` | Add empty line after each print. |
+
 Round time
 
 | Arguments | Structure |
