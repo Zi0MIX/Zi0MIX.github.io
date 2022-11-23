@@ -29,7 +29,7 @@ arguments: {
 | raw_spawnrate | float | any | Raw spawnrate in seconds. |
 | network_frame | float | `0.05` / `0.10` | Network frame value. |
 | map_name | str | func `map_translator()` | Returns name of the map. |
-| class_content | dict | Dump of all values in the class (debugger). |
+| class_content | dict | all class vars | Dump of all values in the class (debugger). |
 
 Refer to [this](https://github.com/Zi0MIX/ZM-RoundCalculator/blob/main/ARGUMENTS.MD) document for argument explanation.
 
