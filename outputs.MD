@@ -34,19 +34,19 @@ arguments: {
 Refer to [this](https://github.com/Zi0MIX/ZM-RoundCalculator/blob/main/ARGUMENTS.MD) document for argument explanation.
 
 ## Output variants:
-- Round time
+- Round time<br>
 | Arguments | Structure |
 | --- | --- |
 | - | Round <round> will spawn in <time_output> and has <zombies> zombies. Spawnrate: <spawnrate> Network frame: <network_frame>. |
 | `-c` | <time_output> |
 
-- Perfect times
+- Perfect times<br>
 | Arguments | Structure |
 | --- | --- |
 | - | Perfect time to round <round> is <time_output> on <map_name>. |
 | `-c` | <time_output> |
 
-- Mods
+- Mods<br>
 | Arguments | Structure |
 | --- | --- |
 | `-rs` | <raw_spawnrate> |
