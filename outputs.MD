@@ -38,22 +38,22 @@ Round time
 
 | Arguments | Structure |
 | --- | --- |
-| - | Round <round> will spawn in <time_output> and has <zombies> zombies. Spawnrate: <spawnrate> Network frame: <network_frame>. |
-| `-c` | <time_output> |
+| - | Round `round` will spawn in `time_output` and has `zombies` zombies. Spawnrate: `spawnrate` Network frame: `network_frame`. |
+| `-c` | `time_output` |
 
 Perfect times
 
 | Arguments | Structure |
 | --- | --- |
-| - | Perfect time to round <round> is <time_output> on <map_name>. |
-| `-c` | <time_output> |
+| - | Perfect time to round `round` is `time_output` on `map_name`. |
+| `-c` | `time_output` |
 
 Mods
 
 | Arguments | Structure |
 | --- | --- |
-| `-rs` | <raw_spawnrate> |
-| `-ps` | <spawnrate> |
-| `-zc` | <zombies> |
-| `-db` | <class_content> |
-| `-ddb` | <class_content> |
+| `-rs` | `raw_spawnrate` |
+| `-ps` | `spawnrate` |
+| `-zc` | `zombies` |
+| `-db` | `class_content` |
+| `-ddb` | `class_content` |
