@@ -37,7 +37,7 @@ Refer to [this](https://github.com/Zi0MIX/ZM-RoundCalculator/blob/main/ARGUMENTS
 - Round time
 | Arguments | Structure |
 | --- | --- |
-| - | | Round <round> will spawn in <time_output> and has <zombies> zombies. Spawnrate: <spawnrate> Network frame: <network_frame>. |
+| - | Round <round> will spawn in <time_output> and has <zombies> zombies. Spawnrate: <spawnrate> Network frame: <network_frame>. |
 | `-c` | <time_output> |
 
 - Perfect times
