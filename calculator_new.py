@@ -409,7 +409,7 @@ def calculator_custom(rnd: int, players: int, mods: list) -> list[dict]:
 
 
 def calculator_handler(inputs: dict) -> list[str]:
-    rnd, players, map_code, args_used = int(inputs["rounds"]), int(inputs["players"]), str(inputs["map_code"], bool(inputs["arguments"]))
+    rnd, players, map_code, args_used = int(inputs["rounds"]), int(inputs["players"]), str(inputs["map_code"]), bool(inputs["arguments"])
 
     global args
     args = inputs["args"]
