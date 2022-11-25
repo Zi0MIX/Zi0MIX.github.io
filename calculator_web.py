@@ -94,7 +94,7 @@ class ZombieRound:
             if real_decimals[0] == "10":
                 real_decimals[0] = "0"
                 inside[0] = str(int(inside[0]) + 1)
-        
+
         inside[1] = "".join(real_decimals)
         # print(f"{inside} / original: {str(self.raw_spawn_delay).split('.')}")
 
@@ -125,7 +125,7 @@ class ZombieRound:
             multiplier = 1.0
         elif self.number >= 10:
             multiplier *= (self.number * 0.15)
-    
+
         if self.players == 1:
             temp = int(ZOMBIE_MAX_AI + (0.5 * ZOMBIE_AI_PER_PLAYER * multiplier))
         else:
@@ -370,7 +370,7 @@ def get_round_times(rnd: ZombieRound) -> dict:
         a["time_output"] = str(rnd.round_time * 1000)
     else:
         a["time_output"] = get_readable_time(rnd.round_time - split_adj)
-    
+
     return a
 
 
@@ -483,4 +483,4 @@ def main(arguments: dict) -> list[str]:
     try:
         return calculator_handler(arguments)
     except Exception as err:
-        return [{"type": "error", "message": err}]
+        return [{"type": "error", "message": str(err)}]

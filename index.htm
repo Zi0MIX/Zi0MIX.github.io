@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="icon" href="favicon.ico" sizes="any">
+    <title>ZM-Round-Calculator</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css" crossorigin>
+
+    <script src="https://pyscript.net/latest/pyscript.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/combine/npm/alpinejs@3/dist/cdn.min.js,npm/bootstrap@5/dist/js/bootstrap.bundle.min.js" crossorigin defer></script>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            const defaultArguments = {
+                // all_results: false,
+                break: true,
+                clear_output: false,
+                detailed: false,
+                lower_time: false,
+                nodecimal: true,
+                perfect_round: false,
+                range: false,
+                speedrun_time: false,
+                teleport_time: true
+            };
+
+            Alpine.store('calculatorInput', {
+                rounds: null,
+                players: null,
+                map_code: null,
+                args: { ...defaultArguments },
+                mods: [],
+                get arguments() {
+                    return !Object.entries(defaultArguments).every(([key, value]) => this.args[key] === value);
+                }
+            });
+
+            Alpine.store('calculatorOutput');
+        });
+
+        addEventListener('DOMContentLoaded', () => {
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        });
+    </script>
+
+    <style>
+        :root {
+            --bs-font-sans-serif: "Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            --bs-font-monospace: "Space Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        ::-moz-selection {
+            background: var(--bs-light);
+            color: var(--bs-dark);
+        }
+
+        ::selection {
+            background: var(--bs-light);
+            color: var(--bs-dark);
+        }
+
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--bs-gray) rgba(0, 0, 0, .2);
+        }
+
+        ::-webkit-scrollbar,
+        ::-webkit-resizer,
+        ::-webkit-scrollbar-corner {
+            background: none;
+        }
+
+        ::-webkit-scrollbar {
+            width: .625rem;
+            height: .625rem;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, .2);
+            border-radius: .25rem;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--bs-gray);
+            background-clip: content-box;
+            border: .125rem solid rgba(0, 0, 0, 0);
+            border-radius: .25rem;
+        }
+
+        [x-cloak],
+        :not(:defined) {
+            display: none !important;
+        }
+
+        .max-vh-100 {
+            max-height: 100vh;
+        }
+
+        .bi {
+            width: 1em;
+            height: 1em;
+            vertical-align: -.15em;
+        }
+
+        .form-check-input:focus,
+        .form-control:focus,
+        .form-select:focus {
+            box-shadow: 0 0 0 .25rem rgba(var(--bs-btn-focus-shadow-rgb), .5);
+        }
+
+        .spinner::after {
+            content: '';
+            box-sizing: border-box;
+            width: 40px;
+            height: 40px;
+            position: absolute;
+            top: calc(40% - 20px);
+            left: calc(50% - 20px);
+            border-radius: 50%;
+        }
+
+        .spinner.smooth::after {
+            border-top: 4px solid rgba(255, 255, 255, 1);
+            border-left: 4px solid rgba(255, 255, 255, 1);
+            border-right: 4px solid rgba(255, 255, 255, 0);
+            animation: spinner 0.6s linear infinite;
+        }
+
+        @keyframes spinner {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .label {
+            text-align: center;
+            width: 100%;
+            display: block;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.8rem;
+            margin-top: 6rem;
+        }
+
+        /* Pop-up second layer begin */
+        .py-overlay {
+            position: fixed;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.5);
+            transition: opacity 500ms;
+            visibility: hidden;
+            color: visible;
+            opacity: 1;
+        }
+
+        .py-overlay {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .list-group-item-black {
+            --bs-list-group-border-color: var(--bs-dark);
+            --bs-list-group-bg: transparent;
+            --bs-list-group-action-hover-color: var(--bs-white);
+            --bs-list-group-action-hover-bg: rgba(0, 0, 0, .15);
+            --bs-list-group-action-active-color: var(--bs-list-group-action-hover-color);
+            --bs-list-group-action-active-bg: var(--bs-list-group-action-hover-bg);
+            --bs-list-group-active-color: var(--bs-list-group-action-hover-color);
+            --bs-list-group-active-bg: var(--bs-list-group-action-hover-bg);
+            --bs-list-group-active-border-color: rgba(0, 0, 0, .15);
+        }
+
+    </style>
+</head>
+
+<body class="text-bg-dark">
+
+    <div class="container-xxl">
+        <div class="my-5 text-center">
+            <h1 class="display-5 fw-bold">ZM-Round-Calculator <span class="badge fs-5 fw-semibold text-bg-primary align-middle">Web UI</span></h1>
+            <p class="lead">A program for calculating best possible round times for Black Ops 1 and Black Ops 2 zombies</p>
+
+            <a class="text-decoration-none" href="https://github.com/Zi0MIX/ZM-RoundCalculator" target="_blank" rel="noopener external">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi text-secondary me-1" viewBox="0 0 16 16">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+                </svg>
+                <span class="text-secondary">Zi0MIX /</span> ZM-RoundCalculator
+            </a>
+        </div>
+    </div>
+
+    <div class="container-xxl rounded bg-black bg-opacity-10 p-4">
+        <div class="row">
+
+            <!-- Inputs -->
+            <div
+                x-data="{
+                    debugView: false,
+                    argumentsList: Object.keys($store.calculatorInput.args),
+                    get commands() {
+                        const { rounds, players, map_code, args, mods } = $store.calculatorInput;
+                        const flags = Object.keys(args).filter(item => args[item]).map(item => this.toFlags(item)).concat(mods);
+
+                        let output = [
+                            [`${rounds}`, `${players}`, ...flags].join(' ')
+                        ];
+
+                        if (map_code)
+                            output.push(map_code);
+
+                        return output;
+                    },
+                    get inputData() {
+                        return JSON.stringify($store.calculatorInput, null, 4);
+                    },
+                    get modsAsString() {
+                        return $store.calculatorInput.mods.join(' ');
+                    },
+                    modsToArray() {
+                        $store.calculatorInput.mods = this.$el.value.split(/[\s,]/).map(item => item.trim()).filter(item => item);
+                    },
+                    resetMapCode() {
+                        $store.calculatorInput.map_code = null;
+                        this.$el.blur();
+                    },
+                    humanize(input) {
+                        input = input.replaceAll(/[^a-zA-Z0-9]/g, ' ');
+                        return input.charAt(0).toUpperCase() + input.slice(1);
+                    },
+                    toFlags(input) {
+                        return `-${input.charAt(0)}`;
+                    }
+                }"
+                class="col-3">
+
+                <div class="d-flex justify-content-end mb-1 flex-grow-0 align-items-center">
+                    <h2 class="h5 mb-1 me-auto">Inputs</h2>
+                    <nav>
+                        <button
+                            x-on:click="debugView = !debugView"
+                            x-bind:class="debugView ? 'active' : ''"
+                            type="button"
+                            class="btn btn-dark btn-sm"
+                            title="CLI data"
+                            data-bs-toggle="tooltip"
+                            data-bs-placement="bottom">
+
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-code" viewBox="0 0 16 16">
+                                <path d="M5.854 4.854a.5.5 0 1 0-.708-.708l-3.5 3.5a.5.5 0 0 0 0 .708l3.5 3.5a.5.5 0 0 0 .708-.708L2.707 8l3.147-3.146zm4.292 0a.5.5 0 0 1 .708-.708l3.5 3.5a.5.5 0 0 1 0 .708l-3.5 3.5a.5.5 0 0 1-.708-.708L13.293 8l-3.147-3.146z" />
+                            </svg>
+                        </button>
+                    </nav>
+                </div>
+
+                <hr class="text-secondary mt-2">
+
+                <div x-show="!debugView" class="row g-3">
+                    <div class="col-md-6">
+                        <label for="input-rounds" class="form-label">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                <path d="M3 0a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V3a3 3 0 0 0-3-3H3zm2.5 4a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM12 13.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM5.5 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM8 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+                            </svg>
+                            Rounds
+                        </label>
+                        <input x-model.number="$store.calculatorInput.rounds" type="number" min="1" max="255" class="form-control bg-black bg-opacity-25 text-light border-dark" id="input-rounds">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="input-players" class="form-label">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+                            </svg>
+                            Players
+                        </label>
+                        <input x-model.number="$store.calculatorInput.players" type="number" min="1" max="4" class="form-control bg-black bg-opacity-25 text-light border-dark" id="input-players">
+                    </div>
+
+                    <div class="col-12">
+                        <label for="input-map" class="form-label">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.598-.49L10.5.99 5.598.01a.5.5 0 0 0-.196 0l-5 1A.5.5 0 0 0 0 1.5v14a.5.5 0 0 0 .598.49l4.902-.98 4.902.98a.502.502 0 0 0 .196 0l5-1A.5.5 0 0 0 16 14.5V.5zM5 14.09V1.11l.5-.1.5.1v12.98l-.402-.08a.498.498 0 0 0-.196 0L5 14.09zm5 .8V1.91l.402.08a.5.5 0 0 0 .196 0L11 1.91v12.98l-.5.1-.5-.1z" />
+                            </svg>
+                            Map
+                        </label>
+
+                        <div class="hstack">
+                            <select
+                                x-model="$store.calculatorInput.map_code"
+                                class="form-select bg-black bg-opacity-25 text-light border-dark"
+                                id="input-map">
+
+                                <option value selected hidden></option>
+
+                                <template x-for="code in $store.mapCodes">
+                                    <option class="bg-dark" x-bind:value="code" x-text="pyGlobals.get('map_translator')(code)"></option>
+                                </template>
+                            </select>
+
+                            <button x-on:click="resetMapCode()" class="btn btn-link link-secondary" type="button" title="Clear" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
+                                    <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                <path d="M7 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zM0 12a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm7-1.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zm0-5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zM3 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 4.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+                            </svg>
+                            Options
+                        </label>
+
+                        <template x-for="argument in argumentsList.sort()" :key="argument">
+                            <div class="hstack justify-content-between">
+                                <div x-id="['input-argument']" class="form-check form-switch">
+                                    <input
+                                        x-bind:id="$id('input-argument')"
+                                        x-model="$store.calculatorInput.args[argument]"
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        role="switch">
+
+                                    <label
+                                        x-bind:for="$id('input-argument')"
+                                        x-text="humanize(argument)"
+                                        class="form-check-label">
+                                    </label>
+                                </div>
+
+                                <kbd class="text-secondary" x-text="toFlags(argument)"></kbd>
+                            </div>
+                        </template>
+
+                        <div x-show="!$store.calculatorInput.arguments" class="form-text">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                            </svg>
+                            Default argument settings
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <hr class="text-secondary mt-0">
+                        <label for="input-mods" class="form-label small">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z" />
+                            </svg>
+                            Custom arguments
+                        </label>
+
+                        <input
+                            x-bind:value="modsAsString"
+                            x-on:change="modsToArray()"
+                            type="text"
+                            class="form-control form-control-sm bg-black bg-opacity-25 text-info border-dark"
+                            id="input-mods"
+                            spellcheck="false">
+
+                        <div class="form-text">Space separated list</div>
+                    </div>
+
+                    <div class="col-12">
+                        <button
+                            py-click="run_calculator()"
+                            class="btn btn-light w-100"
+                            id="run"
+                            type="button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm2 .5v2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5zm0 4v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zM4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM4 12.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zM7.5 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM7 9.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm.5 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM10 6.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm.5 2.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-1z" />
+                            </svg>
+                            Calculate
+                        </button>
+                    </div>
+                </div>
+
+                <div x-cloak x-show="debugView" class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                <path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm9.5 5.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zm-6.354-.354a.5.5 0 1 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2a.5.5 0 1 0-.708.708L4.793 6.5 3.146 8.146z" />
+                            </svg>
+                            <span x-text="commands.length === 1 ? 'Command' : 'Commands'"></span>
+                        </label>
+
+                        <div class="vstack gap-1">
+                            <template x-for="command in commands">
+                                <pre class="bg-black bg-opacity-25 text-light border-dark rounded p-2 mb-0 user-select-all"><kbd class="me-2 text-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-compact-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6.776 1.553a.5.5 0 0 1 .671.223l3 6a.5.5 0 0 1 0 .448l-3 6a.5.5 0 1 1-.894-.448L9.44 8 6.553 2.224a.5.5 0 0 1 .223-.671z"/></svg></kbd><code x-text="command"></code></pre>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <label class="form-label">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M2 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z" />
+                            </svg>
+                            Data object
+                        </label>
+                        <pre class="bg-black bg-opacity-25 text-light border-dark rounded p-2 mb-0"><code x-text="inputData"></code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Outputs -->
+            <div
+                x-data="{
+                    debugView: false,
+                    get debugData() {
+                        const data = $store.calculatorOutput ?? {};
+
+                        return Object.keys(data).length || data.length
+                            ? JSON.stringify(data, null, 4)
+                            : null;
+                    }
+                }"
+                class="col-9">
+
+                <div class="d-flex flex-column h-100">
+                    <div class="d-flex justify-content-end mb-1 flex-grow-0 align-items-center">
+                        <h2 class="h5 mb-1 me-auto">Results</h2>
+                        <nav class="btn-group btn-group-sm">
+                            <button
+                                x-on:click="debugView = false"
+                                x-bind:class="!debugView ? 'active' : ''"
+                                type="button"
+                                class="btn btn-light"
+                                title="View"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="bottom">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+                                </svg>
+                            </button>
+
+                            <button
+                                x-on:click="debugView = true"
+                                x-bind:class="debugView ? 'active' : ''"
+                                type="button"
+                                class="btn btn-light"
+                                title="Data"
+                                data-bs-toggle="tooltip"
+                                data-bs-placement="bottom">
+
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
+                                    <path d="M2.114 8.063V7.9c1.005-.102 1.497-.615 1.497-1.6V4.503c0-1.094.39-1.538 1.354-1.538h.273V2h-.376C3.25 2 2.49 2.759 2.49 4.352v1.524c0 1.094-.376 1.456-1.49 1.456v1.299c1.114 0 1.49.362 1.49 1.456v1.524c0 1.593.759 2.352 2.372 2.352h.376v-.964h-.273c-.964 0-1.354-.444-1.354-1.538V9.663c0-.984-.492-1.497-1.497-1.6zM13.886 7.9v.163c-1.005.103-1.497.616-1.497 1.6v1.798c0 1.094-.39 1.538-1.354 1.538h-.273v.964h.376c1.613 0 2.372-.759 2.372-2.352v-1.524c0-1.094.376-1.456 1.49-1.456V7.332c-1.114 0-1.49-.362-1.49-1.456V4.352C13.51 2.759 12.75 2 11.138 2h-.376v.964h.273c.964 0 1.354.444 1.354 1.538V6.3c0 .984.492 1.497 1.497 1.6z" />
+                                </svg>
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- View -->
+                    <div
+                        x-show="!debugView"
+                        class="rounded border border-secondary p-3 font-monospace flex-grow-1">
+
+                        <ul id="output-list" class="list-unstyled mb-0"></ul>
+
+                    </div>
+
+                    <!-- Data -->
+                    <pre
+                        x-cloak
+                        x-show="debugView"
+                        class="bg-black bg-opacity-25 text-light border-dark flex-grow-1 rounded p-2 mb-0"><code x-text="debugData"></code><code id="debug-calculator"></code><code id="debug-runner"></code></pre>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Python -->
+    <py-config type="json">
+        {
+            "runtimes": [{
+                "src": "https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js",
+                "name": "pyodide-0.21.3",
+                "lang": "python"
+            }]
+        }
+    </py-config>
+
+    <py-script output="debug-calculator" src="calculator_web.py"></py-script>
+    <py-script output="debug-runner" src="calculator_run.py"></py-script>
+
+</body>
+
+</html>
