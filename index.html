@@ -308,7 +308,7 @@
                                 <option value selected hidden></option>
 
                                 <template x-for="code in $store.mapCodes">
-                                    <option class="bg-dark" x-bind:value="code" x-text="pyGlobals.get('map_translator')(code)"></option>
+                                    <option class="bg-dark" x-bind:value="code" x-text="$store.mapTranslator(code)"></option>
                                 </template>
                             </select>
 
@@ -480,7 +480,7 @@
                     <pre
                         x-cloak
                         x-show="debugView"
-                        class="bg-black bg-opacity-25 text-light border-dark flex-grow-1 rounded p-2 mb-0"><code x-text="debugData"></code><code id="debug-calculator"></code><code id="debug-runner"></code></pre>
+                        class="bg-black bg-opacity-25 text-light border-dark flex-grow-1 rounded p-2 mb-0"><code x-text="debugData"></code><code id="debug"></code></pre>
 
                 </div>
             </div>
@@ -495,12 +495,12 @@
                 "src": "https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js",
                 "name": "pyodide-0.21.3",
                 "lang": "python"
-            }]
+            }],
+            "paths": ["calculator_web.py"]
         }
     </py-config>
 
-    <py-script output="debug-calculator" src="calculator_web.py"></py-script>
-    <py-script output="debug-runner" src="calculator_run.py"></py-script>
+    <py-script output="debug" src="calculator_run.py"></py-script>
 
 </body>
 
