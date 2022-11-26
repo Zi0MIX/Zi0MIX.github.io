@@ -256,6 +256,81 @@ def get_answer_blueprint() -> dict:
     }
 
 
+def get_arguments() -> dict:
+    return {
+        "all_results": {
+            "use_in_web": False,
+            "readable_name": "All results",
+            "shortcode": "-a",
+            "default_state": False,
+            "exp": "Display all numeric results leading to the output. Debug argument."
+        },
+        "break": {
+            "use_in_web": True,
+            "readable_name": "Break",
+            "shortcode": "-b",
+            "default_state": True,
+            "exp": "Display an empty line between results."
+        },
+        "clear": {
+            "use_in_web": True,
+            "readable_name": "Clear output",
+            "shortcode": "-c",
+            "default_state": False,
+            "exp": "Show only numeric output as oppose to complete sentences. Use for datasets."
+        },
+        "detailed": {
+            "use_in_web": True,
+            "readable_name": "Detailed",
+            "shortcode": "-d",
+            "default_state": False,
+            "exp": "Show time in miliseconds instead of formatted string."
+        },
+        "lower_time": {
+            "use_in_web": True,
+            "readable_name": "Lower Time",
+            "shortcode": "-l",
+            "default_state": False,
+            "exp": "Change seconds rounding to go down instead of up."
+        },
+        "nodecimal": {
+            "use_in_web": True,
+            "readable_name": "Nodecimal",
+            "shortcode": "-n",
+            "default_state": True,
+            "exp": "Show time without decimals."
+        },
+        "perfect_times": {
+            "use_in_web": True,
+            "readable_name": "Perfect times",
+            "shortcode": "-p",
+            "default_state": False,
+            "exp": "Instead of perfect round times, display perfect split times for choosen map."
+        },
+        "range": {
+            "use_in_web": True,
+            "readable_name": "Range",
+            "shortcode": "-r",
+            "default_state": False,
+            "exp": "Show results for all rounds leading to selected number."
+        },
+        "speedrun_time": {
+            "use_in_web": True,
+            "readable_name": "Speedrun time",
+            "shortcode": "-s",
+            "default_state": False,
+            "exp": "Show times accordingly to speedrun rules, round end is on number transition instead of when zombies start spawning."
+        },
+        "teleport_time": {
+            "use_in_web": True,
+            "readable_name": "Teleport time",
+            "shortcode": "-t",
+            "default_state": True,
+            "exp": "Adds dog appearance time to perfect dog rounds accordingly to the pattern: 't * dogs / (2 * players))'"
+        },
+    }
+
+
 def map_translator(map_code: str) -> str:
     if map_code == "zm_prototype":
         return "Nacht Der Untoten"
