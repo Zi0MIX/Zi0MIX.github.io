@@ -388,19 +388,19 @@ def calculator_custom(rnd: int, players: int, mods: list) -> list[dict]:
         a["players"] = players
 
         if "-rs" in mods:
-            a["argument"].append("-rs")
+            a["arguments"].append("-rs")
             a["raw_spawnrate"] = zomb.raw_spawn_delay
         elif "-ps" in mods:
-            a["argument"].append("-ps")
+            a["arguments"].append("-ps")
             a["spawnrate"] = zomb.zombie_spawn_delay
         elif "-zc" in mods:
-            a["argument"].append("-zc")
+            a["arguments"].append("-zc")
             a["zombies"] = zomb.zombies
         elif "-db" in mods:
-            a["argument"].append("-db")
+            a["arguments"].append("-db")
             a["class_content"] = vars(zomb)
         elif "-ddb" in mods:
-            a["argument"].append("-ddb")
+            a["arguments"].append("-ddb")
             a["class_content"] = vars(dog)
 
         answer.append(a)
