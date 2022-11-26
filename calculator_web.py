@@ -329,7 +329,7 @@ def get_readable_time(round_time: float) -> str:
     return new_time
 
 
-def get_perfect_times(time_total: float, rnd: int, map_code: str) -> None:
+def get_perfect_times(time_total: float, rnd: int, map_code: str) -> dict:
 
     a = get_answer_blueprint()
     a["type"] = "perfect_time"
@@ -341,10 +341,10 @@ def get_perfect_times(time_total: float, rnd: int, map_code: str) -> None:
     if args["speedrun_time"]:
         split_adj = RND_BETWEEN_NUMBER_FLAG
 
-    if args["clear_output"] and not args["detailed"]:
-        a["readable_time"] = get_readable_time(time_total - split_adj)
-    elif args["clear_output"] and args["detailed"]:
+    if args["detailed"]:
         a["readable_time"] = str(time_total * 1000)
+    else:
+        a["readable_time"] = get_readable_time(time_total - split_adj)
 
     return a
 
@@ -434,7 +434,6 @@ def calculator_handler(inputs: dict) -> list[str]:
                     result = ZombieRound(r, players)
                     round_duration = result.round_time + RND_WAIT_END
                     time_total += round_duration
-                    all_results.append(round_duration)
 
                     if args["range"]:
                         all_results.append(get_perfect_times(time_total, result.number + 1, map_code))
@@ -459,7 +458,6 @@ def calculator_handler(inputs: dict) -> list[str]:
                         round_duration = result.round_time + RND_WAIT_END
                         time_total += round_duration
 
-                    all_results.append(round_duration)
 
                     if args["range"]:
                         all_results.append(get_perfect_times(time_total, result.number + 1, map_code))
@@ -479,8 +477,16 @@ def calculator_handler(inputs: dict) -> list[str]:
     return [get_round_times(ZombieRound(rnd, players))]
 
 
+def process_arguments(args: dict) -> dict:
+    if args["detailed"] and args["nodecimal"]:
+        args["detailed"] = False
+
+    return args
+
+
 def main(arguments: dict) -> list[str]:
     try:
+        arguments["args"] = process_arguments(arguments["args"])
         return calculator_handler(arguments)
     except Exception as err:
         return [{"type": "error", "message": str(err)}]
