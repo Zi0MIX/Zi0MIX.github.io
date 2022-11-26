@@ -436,10 +436,14 @@ def calculator_handler(inputs: dict) -> list[str]:
                     time_total += round_duration
 
                     if args["range"]:
-                        all_results.append(get_perfect_times(time_total, result.number + 1, map_code))
+                        res = get_perfect_times(time_total, result.number + 1, map_code)
+                        res["class_content"] = vars(result)
+                        all_results.append(res)
 
                 if not args["range"]:
-                    all_results.append(get_perfect_times(time_total, result.number, map_code))
+                    res = get_perfect_times(time_total, result.number, map_code)
+                    res["class_content"] = vars(result)
+                    all_results.append(res)
 
 
             case "zm_sumpf" | "zm_factory" | "zm_theater":
@@ -460,10 +464,14 @@ def calculator_handler(inputs: dict) -> list[str]:
 
 
                     if args["range"]:
-                        all_results.append(get_perfect_times(time_total, result.number + 1, map_code))
+                        res = get_perfect_times(time_total, result.number + 1, map_code)
+                        res["class_content"] = vars(result)
+                        all_results.append(res)
 
                 if not args["range"]:
-                    all_results.append(get_perfect_times(time_total, result.number, map_code))
+                    res = get_perfect_times(time_total, result.number, map_code)
+                    res["class_content"] = vars(result)
+                    all_results.append(res)
 
 
             case _:
