@@ -1,6 +1,14 @@
 from js import Alpine, Object, console
 from pyodide.ffi import create_proxy, to_js
-from calculator_web import MAP_LIST, map_translator, main
+
+try:
+    from calculator_web import MAP_LIST, map_translator, main
+except ModuleNotFoundError as err:
+    module_error = [{"type": "error", "message": str(err)}]
+    console.log(str(module_error))
+    output_data = to_js(module_error, dict_converter = Object.fromEntries)
+    Alpine.store('calculatorOutput', output_data)
+
 
 # Expose calculator_web imports to Alpine
 Alpine.store('mapCodes', to_js(MAP_LIST))
