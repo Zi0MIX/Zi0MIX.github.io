@@ -1,0 +1,1 @@
+A web implementation of my Zombies Round Calculator, also serving as an example of it's API capabilities. Please visit [original repository](https://github.com/Zi0MIX/ZM-RoundCalculator) for more informations.
