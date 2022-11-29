@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+
+OWN_PRINT = False
 DEC = 3
 
 # Time from "initial_blackscreen_passed" to "start_of_round" triggers
@@ -22,7 +24,6 @@ DOGS_WAIT_END = 8
 DOGS_WAIT_TELEPORT = 1.5
 
 MAP_LIST = ("zm_prototype", "zm_asylum", "zm_sumpf", "zm_factory", "zm_theater", "zm_pentagon", "zm_cosmodrome", "zm_coast", "zm_temple", "zm_moon", "zm_transit", "zm_nuked", "zm_highrise", "zm_prison", "zm_buried", "zm_tomb")
-
 
 @dataclass
 class ZombieRound:
@@ -240,31 +241,49 @@ class DogRound(ZombieRound):
         return
 
 
+def return_error(err_code: Exception | str, nolist: bool = False) -> list[dict]:
+    if nolist:
+        return {"type": "error", "message": str(err_code)}
+    return [{"type": "error", "message": str(err_code)}]
+
+
+def eval_argv(cli_in: list) -> list | dict:
+    try:
+        cli_in = cli_in[1:]
+
+        if cli_in[0] == "json":
+            from json import loads
+            cli_out = loads(" ".join(cli_in[1:]))
+        elif cli_in[0] == "str":
+            cli_out = cli_in[1:]
+        else:
+            raise TypeError("Inproper 'type' argument provided. Values have to be either 'str' or 'json'")
+
+        return cli_out
+    except (IndexError, TypeError) as err:
+        return return_error(err)
+
+
 def get_answer_blueprint() -> dict:
     """Check outputs.MD for reference"""
     return {
-        "type": "mod",
-        "arguments": [],
+        "type": "",
+        "mod": "",
+        "message": "",
         "round": 0,
         "players": 0,
         "zombies": 0,
-        "time": "00:00",
+        "time_output": "00:00",
         "spawnrate": 0.0,
         "raw_spawnrate": 0.0,
         "network_frame": 0.0,
+        "map_name": "",
         "class_content": {},
     }
 
 
 def get_arguments() -> dict:
     return {
-        "all_results": {
-            "use_in_web": False,
-            "readable_name": "All results",
-            "shortcode": "-a",
-            "default_state": False,
-            "exp": "Display all numeric results leading to the output. Debug argument."
-        },
         "break": {
             "use_in_web": True,
             "readable_name": "Break",
@@ -331,6 +350,63 @@ def get_arguments() -> dict:
     }
 
 
+def curate_arguments(provided_args: dict) -> dict:
+    """Define new rules in the dict below.If argument `master` is different than it's default state, argument `slave` is set to it's default state.\nIf key `eval_true` is set to `True`, function checks if argument `master` is `True`, and if so it sets argument `slave` to `False`"""
+    rules = {
+        "1": {
+            "master": "detailed",
+            "slave": "nodecimals",
+            "eval_true": True,
+        },
+    }
+
+    defaults = get_arguments()
+
+    for rule in rules.keys():
+        master = rules[rule]["master"]
+        slave = rules[rule]["slave"]
+
+        if rules[rule]["eval_true"]:
+            if provided_args[master]:
+                provided_args[slave] = False
+        else:
+            if provided_args[master] != defaults[master]["default_state"]:
+                provided_args[slave] = defaults[slave]["default_state"]
+
+    return provided_args
+
+
+def convert_arguments(list_of_args: list) -> dict:
+    converted = {}
+    try:
+        converted.update({"rounds": int(list_of_args[0])})
+        converted.update({"players": int(list_of_args[1])})
+        converted.update({"map_code": str(list_of_args[2])})
+        # We set arguments to true, easier handling and CLI entry point can be processed fully, doesn't hurt
+        converted.update({"arguments": True})
+
+        default_arguments, arguments = get_arguments(), {}
+        # Fill up dict with default values
+        [arguments.update({a: default_arguments[a]["default_state"]}) for a in default_arguments.keys()]
+        # Override arguments with opposite bool if argument is detected in input
+        if len(list_of_args) > 3:
+            [arguments.update({x: not default_arguments[x]["default_state"]}) for x in default_arguments.keys() if default_arguments[x]["shortcode"] in list_of_args[3:]]
+        converted.update({"args": arguments})
+
+        converted.update({"mods": []})
+        if len(list_of_args) > 3:
+            default_mods = get_mods()
+            converted.update({"mods": [m for m in list_of_args[3:] if m in default_mods]})
+
+        return converted
+    except Exception as err:
+        return return_error(str(err), nolist=True)
+
+
+def get_mods() -> list:
+    return ["-db", "-ddb", "-ps", "-rs", "-zc"]
+
+
 def map_translator(map_code: str) -> str:
     if map_code == "zm_prototype":
         return "Nacht Der Untoten"
@@ -382,6 +458,7 @@ def get_readable_time(round_time: float) -> str:
         m -= 60
 
     dec = f".{str(ms).zfill(3)}"
+    # Clear decimals and append a second, this way it's always rounding up
     if args["nodecimal"] and not args["lower_time"]:
         dec = ""
         s += 1
@@ -391,6 +468,7 @@ def get_readable_time(round_time: float) -> str:
             if m > 59:
                 h += 1
                 m -= 60
+    # Otherwise just clear decimals, it then rounds down
     elif args["nodecimal"]:
         dec = ""
 
@@ -407,7 +485,7 @@ def get_readable_time(round_time: float) -> str:
 def get_perfect_times(time_total: float, rnd: int, map_code: str) -> dict:
 
     a = get_answer_blueprint()
-    a["type"] = "perfect_time"
+    a["type"] = "perfect_times"
     a["round"] = rnd
     a["raw_time"] = time_total
     a["map_name"] = map_translator(map_code)
@@ -417,14 +495,15 @@ def get_perfect_times(time_total: float, rnd: int, map_code: str) -> dict:
         split_adj = RND_BETWEEN_NUMBER_FLAG
 
     if args["detailed"]:
-        a["readable_time"] = str(time_total * 1000)
+        a["time_output"] = str(round(time_total * 1000)) + " ms"
     else:
-        a["readable_time"] = get_readable_time(time_total - split_adj)
+        a["time_output"] = get_readable_time(time_total - split_adj)
 
     return a
 
 
-def get_round_times(rnd: ZombieRound) -> dict:
+def get_round_times(rnd) -> dict:
+    """Rnd: ZombieRound | DogRound"""
 
     a = get_answer_blueprint()
     a["type"] = "round_time"
@@ -442,7 +521,7 @@ def get_round_times(rnd: ZombieRound) -> dict:
         split_adj = RND_BETWEEN_NUMBER_FLAG
 
     if args["detailed"]:
-        a["time_output"] = str(rnd.round_time * 1000)
+        a["time_output"] = str(round(rnd.round_time * 1000)) + " ms"
     else:
         a["time_output"] = get_readable_time(rnd.round_time - split_adj)
 
@@ -450,126 +529,237 @@ def get_round_times(rnd: ZombieRound) -> dict:
 
 
 def calculator_custom(rnd: int, players: int, mods: list) -> list[dict]:
-    answer = []
-
+    calc_result = []
     for r in range(1, rnd + 1):
+        zm_round = ZombieRound(r, players)
+        dog_round = DogRound(r, players, r)
+
         a = get_answer_blueprint()
-
-        zomb = ZombieRound(r, players)
-        dog = DogRound(r, players, r)
-
         a["type"] = "mod"
         a["round"] = r
         a["players"] = players
+        a["raw_spawnrate"] = zm_round.raw_spawn_delay
+        a["spawnrate"] = zm_round.zombie_spawn_delay
+        a["zombies"] = zm_round.zombies
+        a["class_content"] = vars(zm_round)
 
         if "-rs" in mods:
-            a["arguments"].append("-rs")
-            a["raw_spawnrate"] = zomb.raw_spawn_delay
+            a["mod"] = "-rs"
+            a["message"] = str(a["raw_spawnrate"])
         elif "-ps" in mods:
-            a["arguments"].append("-ps")
-            a["spawnrate"] = zomb.zombie_spawn_delay
+            a["mod"] = "-ps"
+            a["message"] = str(a["spawnrate"])
         elif "-zc" in mods:
-            a["arguments"].append("-zc")
-            a["zombies"] = zomb.zombies
+            a["mod"] = "-zc"
+            a["message"] = str(a["zombies"])
         elif "-db" in mods:
-            a["arguments"].append("-db")
-            a["class_content"] = vars(zomb)
+            a["mod"] = "-db"
+            a["message"] = str(a["class_content"])
         elif "-ddb" in mods:
-            a["arguments"].append("-ddb")
-            a["class_content"] = vars(dog)
+            a["mod"] = "-ddb"
+            a["class_content"] = vars(dog_round)
+            a["message"] = str(a["class_content"])
 
-        answer.append(a)
+        calc_result.append(a)
 
-    return answer
+    return calc_result
 
 
-def calculator_handler(inputs: dict) -> list[str]:
-    rnd, players, map_code, args_used = int(inputs["rounds"]), int(inputs["players"]), str(inputs["map_code"]), bool(inputs["arguments"])
+def calculator_handler(json_input: dict | None = None):
 
+    # Take input if standalone app
+    if json_input is None:
+        raw_input = input("> ").lower()
+        raw_input = raw_input.split(" ")
+
+        try:
+            if not isinstance(raw_input, list) or len(raw_input) < 2:
+                raise ValueError("Wrong data input")
+            rnd, players = int(raw_input[0]), int(raw_input[1])
+
+            use_arguments = len(raw_input) > 2
+        except (ValueError, IndexError) as err:
+            return [{"type": err}]
+    # Assign variables from json otherwise
+    else:
+        rnd, players, map_code, use_arguments = int(json_input["rounds"]), int(json_input["players"]), str(json_input["map_code"]), json_input["arguments"] or len(json_input["mods"])
+
+    all_arguments = get_arguments()
     global args
-    args = inputs["args"]
-    mods = inputs["mods"]
-    all_results = []
+    args = {}
 
+    # Assemble arguments list
+    [args.update({key: all_arguments[key]["default_state"]}) for key in all_arguments.keys()]
+
+    # We do not process all the argument logic if arguments are not defined
+    result = ZombieRound(rnd, players)
+    if not use_arguments:
+        return [get_round_times(result)]
+
+    # Define state of arguments
+    if json_input is None:
+        selected_arguments = raw_input[2:]
+        for key in args.keys():
+            if all_arguments[key]["shortcode"] in selected_arguments:
+                args.update({key: not all_arguments[key]["default_state"]})
+    else:
+        for key in args.keys():
+            args.update({key: json_input["args"][key]})
+
+    # Define state of mods
+    if json_input is None:
+        selected_mods = raw_input[2:]
+    else:
+        selected_mods = json_input["mods"]
+    mods = [mod for mod in get_mods() if mod in selected_mods]
+
+    # If mods are selected, custom calculator function entered instead
     if len(mods):
         return calculator_custom(rnd, players, mods)
 
-    result = ZombieRound(rnd, players)
+    all_results = []
 
-    if not args_used:
-        return [get_round_times(result)]
+    # Process perfect splits
+    if args["perfect_times"]:
 
-    if args["perfect_round"]:
+        if json_input is None:
+            print("Enter map code (eg. zm_theater)")
+            map_code = input("> ").lower()
+
         time_total = RND_WAIT_INITIAL
 
-        match map_code:
-            case "zm_prototype" | "zm_asylum" | "zm_coast" | "zm_temple" | "zm_transit" | "zm_nuked" | "zm_prison" | "zm_buried" | "zm_tomb":
+        dog_rounds = 1
+        for r in range(1, rnd):
+            zm_round = ZombieRound(r, players)
+            dog_round = DogRound(r, players, dog_rounds)
 
-                for r in range(1, rnd):
-                    result = ZombieRound(r, players)
-                    round_duration = result.round_time + RND_WAIT_END
+            is_dog_round = r in DOGS_PERFECT
+
+            # Handle arguments here
+            if args["teleport_time"]:
+                dog_round.add_teleport_time()
+
+            match map_code:
+                case "zm_prototype" | "zm_asylum" | "zm_coast" | "zm_temple" | "zm_transit" | "zm_nuked" | "zm_prison" | "zm_buried" | "zm_tomb":
+                    round_duration = zm_round.round_time + RND_WAIT_END
                     time_total += round_duration
 
-                    if args["range"]:
-                        res = get_perfect_times(time_total, result.number + 1, map_code)
-                        res["class_content"] = vars(result)
-                        all_results.append(res)
-
-                if not args["range"]:
-                    res = get_perfect_times(time_total, result.number, map_code)
-                    res["class_content"] = vars(result)
-                    all_results.append(res)
-
-
-            case "zm_sumpf" | "zm_factory" | "zm_theater":
-                dog_rounds = 0
-                for r in range(1, rnd):
-
-                    if r in DOGS_PERFECT:
-                        result = DogRound(r, players, dog_rounds)
-                        if args["teleport_time"]:
-                            result.add_teleport_time()
+                case "zm_sumpf" | "zm_factory" | "zm_theater":
+                    if is_dog_round:
                         dog_rounds += 1
-                        round_duration = DOGS_WAIT_START + DOGS_WAIT_TELEPORT + result.round_time + DOGS_WAIT_END + RND_WAIT_END
+                        round_duration = DOGS_WAIT_START + DOGS_WAIT_TELEPORT + dog_round.round_time + DOGS_WAIT_END + RND_WAIT_END
                         time_total += round_duration
                     else:
-                        result = ZombieRound(r, players)
-                        round_duration = result.round_time + RND_WAIT_END
+                        round_duration = zm_round.round_time + RND_WAIT_END
                         time_total += round_duration
 
+                case _:
+                    if json_input is None:
+                        print(f"Map {COL}{map_translator(map_code)}{RES} is not supported.")
+                    return return_error(f"{map_translator(map_code)} is not supported")
 
-                    if args["range"]:
-                        res = get_perfect_times(time_total, result.number + 1, map_code)
-                        res["class_content"] = vars(result)
-                        all_results.append(res)
+            if args["range"]:
+                res = get_perfect_times(time_total, r + 1, map_code)
+                res["class_content"] = vars(zm_round)
+                if is_dog_round:
+                    res["class_content"] = vars(dog_round)
+                all_results.append(res)
 
-                if not args["range"]:
-                    res = get_perfect_times(time_total, result.number, map_code)
-                    res["class_content"] = vars(result)
-                    all_results.append(res)
-
-
-            case _:
-                return [{"type": "error", "message": f"'{map_code}' not supported."}]
+        if not args["range"]:
+            res = get_perfect_times(time_total, rnd, map_code)
+            res["class_content"] = vars(zm_round)
+            if is_dog_round:
+                res["class_content"] = vars(dog_round)
+            all_results.append(res)
 
         return all_results
 
     if args["range"]:
-        return [get_round_times(ZombieRound(r, players)) for r in range (1, rnd)]
+        all_results = [get_round_times(ZombieRound(r, players)) for r in range (1, rnd)]
+        return all_results
 
     return [get_round_times(ZombieRound(rnd, players))]
 
 
-def process_arguments(args: dict) -> dict:
-    if args["detailed"] and args["nodecimal"]:
-        args["detailed"] = False
+def display_results(results: list[dict]) -> None:
+    for res in results:
 
-    return args
+        # Assemble print
+        match res["type"]:
+            case "round_time":
+                if args["clear"]:
+                    print(res["time_output"])
+                else:
+                    print(f"Round {COL}{res['round']}{RES} will spawn in {COL}{res['time_output']}{RES} and has {COL}{res['zombies']}{RES} zombies. (Spawnrate: {COL}{res['spawnrate']}{RES} / Network frame: {COL}{res['network_frame']}{RES}).")
+
+                if args["break"]:
+                    print()
+
+            case "perfect_times":
+                if args["clear"]:
+                    print(res["time_output"])
+                else:
+                    print(f"Perfect time to round {COL}{res['round']}{RES} is {COL}{res['time_output']}{RES} on {COL}{res['map_name']}{RES}.")
+
+                if args["break"]:
+                    print()
+
+            case "mod":
+                print(res["message"])
+
+            case "error":
+                print("An error occured, if your inputs are correct, please contact the creator.")
+                print(res["message"])
+
+    return
 
 
-def main(arguments: dict) -> list[str]:
-    try:
-        arguments["args"] = process_arguments(arguments["args"])
-        return calculator_handler(arguments)
-    except Exception as err:
-        return [{"type": "error", "message": str(err)}]
+def main_app() -> None:
+    import os
+    from colorama import init, reinit, deinit
+
+    os.system("cls")    # Bodge for colorama not working after compile
+    init()
+    print(f"Welcome in ZM Round Calculator {YEL}V3 BETA{RES} by Zi0")
+    print(f"Source: '{CYA}https://github.com/Zi0MIX/ZM-RoundCalculator{RES}'")
+    print(f"Check out web implementation of the calculator under '{CYA}https://zi0mix.github.io{RES}'")
+    print("Enter round number and amount of players separated by spacebar, then optional arguments")
+    print("Round and Players arguments are mandatory, others are optional. Check ARGUMENTS.MD on GitHub for info.")
+
+    while True:
+        reinit()
+        result = calculator_handler(None)
+        display_results(result)
+        deinit()
+
+
+def main_api(arguments: dict | list) -> dict:
+    if isinstance(arguments, list):
+        arguments = convert_arguments(arguments)
+        # Passing error
+        if "type" in arguments.keys():
+            print(arguments["message"])
+            return arguments
+
+    arguments["args"] = curate_arguments(arguments["args"])
+
+    if OWN_PRINT:
+        return display_results(calculator_handler(arguments))
+    return calculator_handler(arguments)
+
+# print(__name__)
+if __name__ == "__main__":
+    from sys import argv
+
+    if len(argv) > 1:
+        COL, RES = "", ""
+        argv = eval_argv(argv)
+        main_api(argv)
+    else:
+        from colorama import Fore
+        # For output syntax highlighting use COL variable
+        COL, RES = Fore.YELLOW, Fore.RESET
+        YEL, GRE, RED, CYA = Fore.YELLOW, Fore.GREEN, Fore.RED, Fore.CYAN
+
+        # Standalone app
+        main_app()
