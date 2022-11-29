@@ -25,6 +25,8 @@ DOGS_WAIT_END = 8
 DOGS_WAIT_TELEPORT = 1.5
 
 MAP_LIST = ("zm_prototype", "zm_asylum", "zm_sumpf", "zm_factory", "zm_theater", "zm_pentagon", "zm_cosmodrome", "zm_coast", "zm_temple", "zm_moon", "zm_transit", "zm_nuked", "zm_highrise", "zm_prison", "zm_buried", "zm_tomb")
+MAP_DOGS = ("zm_sumpf", "zm_factory", "zm_theater")
+
 
 @dataclass
 class ZombieRound:
@@ -107,6 +109,10 @@ class ZombieRound:
         self.zombie_spawn_delay = 2.0
         self.raw_spawn_delay = 2.0
 
+        if args["remix"]:
+            self.zombie_spawn_delay = 1.0
+            self.raw_spawn_delay = 1.0
+
         if self.number > 1:
             for _ in range(1, self.number):
                 self.zombie_spawn_delay *= 0.95
@@ -144,6 +150,8 @@ class ZombieRound:
             self.zombies = int(temp * 0.7)
         elif self.number < 6:
             self.zombies = int(temp * 0.9)
+
+        self.hordes = round(self.zombies / 24, 2)
 
         return
 
@@ -274,7 +282,9 @@ def get_answer_blueprint() -> dict:
         "round": 0,
         "players": 0,
         "zombies": 0,
+        "hordes": 0.0,
         "time_output": "00:00",
+        "special_average": 0.0,
         "spawnrate": 0.0,
         "raw_spawnrate": 0.0,
         "network_frame": 0.0,
@@ -306,6 +316,20 @@ def get_arguments() -> dict:
             "default_state": False,
             "exp": "Show time in miliseconds instead of formatted string."
         },
+        "even_time": {
+            "use_in_web": True,
+            "readable_name": "Even time",
+            "shortcode": "-e",
+            "default_state": False,
+            "exp": "Time output always has 5 symbols."
+        },
+        "hordes": {
+            "use_in_web": True,
+            "readable_name": "Hordes",
+            "shortcode": "-h",
+            "default_state": False,
+            "exp": "Show the amount of hordes instead of the amount of zombies in the output."
+        },
         "lower_time": {
             "use_in_web": True,
             "readable_name": "Lower Time",
@@ -333,6 +357,20 @@ def get_arguments() -> dict:
             "shortcode": "-r",
             "default_state": False,
             "exp": "Show results for all rounds leading to selected number."
+        },
+        "remix": {
+            "use_in_web": True,
+            "readable_name": "Remix",
+            "shortcode": "-remix",
+            "default_state": False,
+            "exp": "Use spawn and zombie logic applied in 5and5s mod Remix."
+        },
+        "special_rounds": {
+            "use_in_web": False,
+            "readable_name": "Special rounds",
+            "shortcode": "-spec",
+            "default_state": False,
+            "exp": "Add own set of special rounds to perfect times predictor to maps that support it."
         },
         "speedrun_time": {
             "use_in_web": True,
@@ -385,6 +423,8 @@ def convert_arguments(list_of_args: list) -> dict:
         converted.update({"map_code": str(list_of_args[2])})
         # We set arguments to true, easier handling and CLI entry point can be processed fully, doesn't hurt
         converted.update({"arguments": True})
+        # Currently not supported from CLI call
+        converted.update({"spec_rounds": tuple()})
 
         default_arguments, arguments = get_arguments(), {}
         # Fill up dict with default values
@@ -445,6 +485,16 @@ def map_translator(map_code: str) -> str:
     return map_code
 
 
+def import_dogrounds() -> tuple:
+    print(f"{CYA}Enter special rounds separated with space.{RES}")
+    raw_special = str(input("> "))
+
+    list_special = [int(x) for x in raw_special.split(" ") if x.isdigit()]
+    if len(list_special):
+        return tuple(list_special)
+    return DOGS_PERFECT
+
+
 def get_readable_time(round_time: float) -> str:
     h, m, s, ms = 0, 0, 0, int(round_time * 1000)
 
@@ -454,9 +504,11 @@ def get_readable_time(round_time: float) -> str:
     while s > 59:
         m += 1
         s -= 60
-    while m > 59:
-        h += 1
-        m -= 60
+    # Do not reduce minutes to hours if even_time is on
+    if not args["even_time"]:
+        while m > 59:
+            h += 1
+            m -= 60
 
     dec = f".{str(ms).zfill(3)}"
     # Clear decimals and append a second, this way it's always rounding up
@@ -479,6 +531,9 @@ def get_readable_time(round_time: float) -> str:
         new_time = f"{str(m).zfill(2)}:{str(s).zfill(2)}{dec}"
     else:
         new_time = f"{str(h).zfill(2)}:{str(m).zfill(2)}:{str(s).zfill(2)}{dec}"
+
+    if args["even_time"]:
+        new_time = f"{str(m).zfill(2)}:{str(s).zfill(2)}"
 
     return new_time
 
@@ -511,6 +566,7 @@ def get_round_times(rnd) -> dict:
     a["round"] = rnd.number
     a["players"] = rnd.players
     a["zombies"] = rnd.zombies
+    a["hordes"] = rnd.hordes
     a["raw_time"] = rnd.raw_time
     a["spawnrate"] = rnd.zombie_spawn_delay
     a["raw_spawnrate"] = rnd.raw_spawn_delay
@@ -632,48 +688,75 @@ def calculator_handler(json_input: dict | None = None):
             print("Enter map code (eg. zm_theater)")
             map_code = input("> ").lower()
 
+        if map_code not in MAP_LIST:
+            if json_input is None:
+                print(f"Map {COL}{map_translator(map_code)}{RES} is not supported.")
+            return return_error(f"{map_translator(map_code)} is not supported")
+
         time_total = RND_WAIT_INITIAL
+
+        try:
+            # Not map with dogs
+            if map_code not in MAP_DOGS:
+                set_dog_rounds = tuple()
+            # Not specified special_rounds or is remix
+            elif not args["special_rounds"] or args["remix"]:
+                set_dog_rounds = DOGS_PERFECT
+            # Not api mode or empty api entry provided -> take input
+            elif not json_input or not len(json_input["spec_rounds"]):
+                set_dog_rounds = import_dogrounds()
+            # Take entry from api call
+            else:
+                set_dog_rounds = tuple(json_input["spec_rounds"])
+        except KeyError:
+            if not json_input:
+                print("Warning: Key error dog rounds")
+            set_dog_rounds = DOGS_PERFECT
+
+        dog_rounds_average = 0.0
+        if len(set_dog_rounds):
+            from statistics import mean
+            dog_rounds_average = round(mean(set_dog_rounds), 1)
 
         dog_rounds = 1
         for r in range(1, rnd):
             zm_round = ZombieRound(r, players)
             dog_round = DogRound(r, players, dog_rounds)
 
-            is_dog_round = r in DOGS_PERFECT
-
             # Handle arguments here
             if args["teleport_time"]:
                 dog_round.add_teleport_time()
 
-            match map_code:
-                case "zm_prototype" | "zm_asylum" | "zm_coast" | "zm_temple" | "zm_transit" | "zm_nuked" | "zm_prison" | "zm_buried" | "zm_tomb":
-                    round_duration = zm_round.round_time + RND_WAIT_END
-                    time_total += round_duration
+            is_dog_round = r in set_dog_rounds
 
-                case "zm_sumpf" | "zm_factory" | "zm_theater":
-                    if is_dog_round:
-                        dog_rounds += 1
-                        round_duration = DOGS_WAIT_START + DOGS_WAIT_TELEPORT + dog_round.round_time + DOGS_WAIT_END + RND_WAIT_END
-                        time_total += round_duration
-                    else:
-                        round_duration = zm_round.round_time + RND_WAIT_END
-                        time_total += round_duration
-
-                case _:
-                    if json_input is None:
-                        print(f"Map {COL}{map_translator(map_code)}{RES} is not supported.")
-                    return return_error(f"{map_translator(map_code)} is not supported")
+            if is_dog_round:
+                dog_rounds += 1
+                round_duration = DOGS_WAIT_START + DOGS_WAIT_TELEPORT + dog_round.round_time + DOGS_WAIT_END + RND_WAIT_END
+                time_total += round_duration
+            else:
+                round_duration = zm_round.round_time + RND_WAIT_END
+                time_total += round_duration
 
             if args["range"]:
+                remembered_dog_average = 0.0
+
                 res = get_perfect_times(time_total, r + 1, map_code)
                 res["class_content"] = vars(zm_round)
+                res["special_average"] = remembered_dog_average
                 if is_dog_round:
                     res["class_content"] = vars(dog_round)
+
+                    # Get new average on each dog round
+                    temp_dog_rounds = [d for d in set_dog_rounds if d <= r]
+                    res["special_average"] = round(sum(temp_dog_rounds) / len(temp_dog_rounds), 1)
+                    remembered_dog_average = res["special_average"]
+
                 all_results.append(res)
 
         if not args["range"]:
             res = get_perfect_times(time_total, rnd, map_code)
             res["class_content"] = vars(zm_round)
+            res["special_average"] = dog_rounds_average
             if is_dog_round:
                 res["class_content"] = vars(dog_round)
             all_results.append(res)
@@ -691,12 +774,18 @@ def display_results(results: list[dict]) -> list[dict]:
     for res in results:
 
         # Assemble print
+        zm_word = "zombies"
         match res["type"]:
             case "round_time":
+                enemies = res["zombies"]
+                if args["hordes"]:
+                    zm_word = "hordes"
+                    enemies = res["hordes"]
+
                 if args["clear"]:
                     print(res["time_output"])
                 else:
-                    print(f"Round {COL}{res['round']}{RES} will spawn in {COL}{res['time_output']}{RES} and has {COL}{res['zombies']}{RES} zombies. (Spawnrate: {COL}{res['spawnrate']}{RES} / Network frame: {COL}{res['network_frame']}{RES}).")
+                    print(f"Round {COL}{res['round']}{RES} will spawn in {COL}{res['time_output']}{RES} and has {COL}{enemies}{RES} {zm_word}. (Spawnrate: {COL}{res['spawnrate']}{RES} / Network frame: {COL}{res['network_frame']}{RES}).")
 
                 if args["break"]:
                     print()
