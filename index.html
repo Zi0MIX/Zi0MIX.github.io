@@ -13,38 +13,47 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" crossorigin>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/css/bootstrap.min.css" crossorigin>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/bootstrap@5/dist/css/bootstrap.min.css,gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" crossorigin>
 
     <script src="https://pyscript.net/latest/pyscript.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/combine/npm/alpinejs@3/dist/cdn.min.js,npm/bootstrap@5/dist/js/bootstrap.bundle.min.js" crossorigin defer></script>
+    <script src="https://cdn.jsdelivr.net/combine/npm/alpinejs@3/dist/cdn.min.js,npm/bootstrap@5/dist/js/bootstrap.bundle.min.js,gh/highlightjs/cdn-release@11/build/highlight.min.js,npm/showdown@2/dist/showdown.min.js" crossorigin defer></script>
 
     <script>
         document.addEventListener('alpine:init', () => {
-            const defaultArguments = {
-                // all_results: false,
-                break: true,
-                clear_output: false,
-                detailed: false,
-                lower_time: false,
-                nodecimal: true,
-                perfect_round: false,
-                range: false,
-                speedrun_time: false,
-                teleport_time: true
-            };
+            Alpine.store('arguments', {});
+            Alpine.store('time', {
+                start: 0,
+                end: 0,
+                get total() {
+                    const time = ((this.end - this.start) / 1000).toFixed(3);
+                    return `${time} seconds`;
+                },
+                get loading() {
+                    return this.end - this.start < 0;
+                }
+            });
 
             Alpine.store('calculatorInput', {
                 rounds: null,
                 players: null,
                 map_code: null,
-                args: { ...defaultArguments },
+                args: {},
                 mods: [],
                 get arguments() {
-                    return !Object.entries(defaultArguments).every(([key, value]) => this.args[key] === value);
+                    const allArguments = Alpine.store('arguments');
+                    const inputArguments = Object.entries(this.args);
+                    return !inputArguments.length || inputArguments.some(([key, value]) => allArguments[key].default_state !== value);
                 }
             });
 
-            Alpine.store('calculatorOutput');
+            Alpine.store('resetArguments', () => {
+                const allArguments = Object.entries(Alpine.store('arguments'));
+                const webArguments = allArguments.filter(([key, item]) => item.use_in_web);
+                const defaultStates = webArguments.map(([key, item]) => [key, item.default_state]);
+                Alpine.store('calculatorInput').args = Object.fromEntries(defaultStates);
+            });
+
+            Alpine.effect(Alpine.store('resetArguments'));
         });
 
         addEventListener('DOMContentLoaded', () => {
@@ -102,10 +111,6 @@
             display: none !important;
         }
 
-        .max-vh-100 {
-            max-height: 100vh;
-        }
-
         .bi {
             width: 1em;
             height: 1em;
@@ -121,19 +126,18 @@
         .spinner::after {
             content: '';
             box-sizing: border-box;
-            width: 40px;
-            height: 40px;
-            position: absolute;
-            top: calc(40% - 20px);
-            left: calc(50% - 20px);
+            width: 32px;
+            height: 32px;
+            display: block;
+            margin: 0 auto;
             border-radius: 50%;
         }
 
         .spinner.smooth::after {
-            border-top: 4px solid rgba(255, 255, 255, 1);
-            border-left: 4px solid rgba(255, 255, 255, 1);
-            border-right: 4px solid rgba(255, 255, 255, 0);
-            animation: spinner 0.6s linear infinite;
+            border-top: 3px solid rgba(255, 255, 255, 1);
+            border-left: 3px solid rgba(255, 255, 255, 1);
+            border-right: 3px solid rgba(255, 255, 255, 0);
+            animation: spinner .6s linear infinite;
         }
 
         @keyframes spinner {
@@ -142,16 +146,22 @@
             }
         }
 
-        .label {
+        .py-overlay .label {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 12.5%;
             text-align: center;
             width: 100%;
             display: block;
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.8rem;
-            margin-top: 6rem;
+            color: var(--bs-secondary);
+            font-size: .875rem;
         }
 
-        /* Pop-up second layer begin */
+        .py-overlay .label p {
+            margin-bottom: 0;
+        }
+
         .py-overlay {
             position: fixed;
             display: flex;
@@ -162,11 +172,13 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(0, 0, 0, 0.5);
-            transition: opacity 500ms;
+            background: rgba(var(--bs-dark-rgb), .65);
+            backdrop-filter: blur(33px);
+            transition: backdrop-filter 500ms, opacity 500ms;
             visibility: hidden;
             color: visible;
             opacity: 1;
+            z-index: 1000;
         }
 
         .py-overlay {
@@ -174,16 +186,19 @@
             opacity: 1;
         }
 
-        .list-group-item-black {
-            --bs-list-group-border-color: var(--bs-dark);
-            --bs-list-group-bg: transparent;
-            --bs-list-group-action-hover-color: var(--bs-white);
-            --bs-list-group-action-hover-bg: rgba(0, 0, 0, .15);
-            --bs-list-group-action-active-color: var(--bs-list-group-action-hover-color);
-            --bs-list-group-action-active-bg: var(--bs-list-group-action-hover-bg);
-            --bs-list-group-active-color: var(--bs-list-group-action-hover-color);
-            --bs-list-group-active-bg: var(--bs-list-group-action-hover-bg);
-            --bs-list-group-active-border-color: rgba(0, 0, 0, .15);
+        .hljs {
+            background: none;
+        }
+
+        #debug,
+        pre code.hljs {
+            padding: 0 !important;
+        }
+
+        .table-dark {
+            --bs-table-color: var(--bs-gray-500);
+            --bs-table-bg: rgba(0, 0, 0, .25);
+            --bs-table-border-color: var(--bs-gray-900);
         }
 
     </style>
@@ -191,302 +206,486 @@
 
 <body class="text-bg-dark">
 
-    <div class="container-xxl">
-        <div class="my-5 text-center">
-            <h1 class="display-5 fw-bold">ZM-Round-Calculator <span class="badge fs-5 fw-semibold text-bg-primary align-middle">Web UI</span></h1>
-            <p class="lead">A program for calculating best possible round times for Black Ops 1 and Black Ops 2 zombies</p>
+    <header>
+        <div class="container-xxl">
+            <div class="my-3 my-lg-5 text-center">
+                <h1 class="display-5 fw-bold">ZM-Round-Calculator <span class="badge fs-5 fw-semibold text-bg-primary align-middle">Web UI</span></h1>
+                <p class="lead">A program for calculating best possible round times for Black Ops 1 and Black Ops 2 zombies</p>
 
-            <a class="text-decoration-none" href="https://github.com/Zi0MIX/ZM-RoundCalculator" target="_blank" rel="noopener external">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi text-secondary me-1" viewBox="0 0 16 16">
-                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
-                </svg>
-                <span class="text-secondary">Zi0MIX /</span> ZM-RoundCalculator
-            </a>
+                <a class="text-decoration-none" href="https://github.com/Zi0MIX/ZM-RoundCalculator" target="_blank" rel="noopener external">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi text-secondary me-1" viewBox="0 0 16 16">
+                        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z" />
+                    </svg>
+                    <span class="text-secondary">Zi0MIX /</span> ZM-RoundCalculator
+                </a>
+            </div>
         </div>
-    </div>
+    </header>
 
-    <div class="container-xxl rounded bg-black bg-opacity-10 p-4">
-        <div class="row">
+    <main
+        x-data="{
+            hash: location.hash,
+            currentTab(tabs) {
+                return tabs.includes(this.hash);
+            },
+            activeTab(alt = null) {
+                const tabs = [this.$el.getAttribute('href'), alt];
+                return tabs.includes(this.hash) ? 'link-light active' : 'link-secondary';
+            },
+            async getFile(url) {
+                const response = await fetch(url);
+                const markdown = await response.text();
 
-            <!-- Inputs -->
-            <div
-                x-data="{
-                    debugView: false,
-                    argumentsList: Object.keys($store.calculatorInput.args),
-                    get commands() {
-                        const { rounds, players, map_code, args, mods } = $store.calculatorInput;
-                        const flags = Object.keys(args).filter(item => args[item]).map(item => this.toFlags(item)).concat(mods);
+                const classMap = {
+                    a: 'text-decoration-none',
+                    code: 'text-info',
+                    table: 'table table-dark'
+                };
 
-                        let output = [
-                            [`${rounds}`, `${players}`, ...flags].join(' ')
-                        ];
+                const bindings = Object.keys(classMap).map(key => ({
+                    type: 'output',
+                    regex: new RegExp(`<${key}(.*)>`, 'g'),
+                    replace: `<${key} class='${classMap[key]}' $1>`
+                }));
 
-                        if (map_code)
-                            output.push(map_code);
+                const converter = new showdown.Converter({
+                    extensions: [...bindings]
+                });
 
-                        return output;
-                    },
-                    get inputData() {
-                        return JSON.stringify($store.calculatorInput, null, 4);
-                    },
-                    get modsAsString() {
-                        return $store.calculatorInput.mods.join(' ');
-                    },
-                    modsToArray() {
-                        $store.calculatorInput.mods = this.$el.value.split(/[\s,]/).map(item => item.trim()).filter(item => item);
-                    },
-                    resetMapCode() {
-                        $store.calculatorInput.map_code = null;
-                        this.$el.blur();
-                    },
-                    humanize(input) {
-                        input = input.replaceAll(/[^a-zA-Z0-9]/g, ' ');
-                        return input.charAt(0).toUpperCase() + input.slice(1);
-                    },
-                    toFlags(input) {
-                        return `-${input.charAt(0)}`;
-                    }
-                }"
-                class="col-3">
+                converter.setFlavor('github');
+                return converter.makeHtml(markdown);
+            }
+        }"
+        x-on:hashchange.window="hash = location.hash">
 
-                <div class="d-flex justify-content-end mb-1 flex-grow-0 align-items-center">
-                    <h2 class="h5 mb-1 me-auto">Inputs</h2>
-                    <nav>
-                        <button
-                            x-on:click="debugView = !debugView"
-                            x-bind:class="debugView ? 'active' : ''"
-                            type="button"
-                            class="btn btn-dark btn-sm"
-                            title="CLI data"
-                            data-bs-toggle="tooltip"
-                            data-bs-placement="bottom">
+        <nav class="nav justify-content-center mb-2">
+            <a x-bind:class="activeTab('')" class="nav-link link-secondary" href="#calculator">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                    <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm2 .5v2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5zm0 4v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zM4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM4 12.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zM7.5 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM7 9.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm.5 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM10 6.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm.5 2.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-1z" />
+                </svg>
+                Calculator
+            </a>
+            <a x-bind:class="activeTab()" class="nav-link link-secondary" href="#readme">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                    <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
+                </svg>
+                Readme
+            </a>
+            <a x-bind:class="activeTab()" class="nav-link link-secondary" href="#arguments">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                    <path d="M7 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zM0 12a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm7-1.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zm0-5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zM3 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 4.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+                </svg>
+                Arguments
+            </a>
+        </nav>
 
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-code" viewBox="0 0 16 16">
-                                <path d="M5.854 4.854a.5.5 0 1 0-.708-.708l-3.5 3.5a.5.5 0 0 0 0 .708l3.5 3.5a.5.5 0 0 0 .708-.708L2.707 8l3.147-3.146zm4.292 0a.5.5 0 0 1 .708-.708l3.5 3.5a.5.5 0 0 1 0 .708l-3.5 3.5a.5.5 0 0 1-.708-.708L13.293 8l-3.147-3.146z" />
-                            </svg>
-                        </button>
-                    </nav>
-                </div>
+        <section x-show="currentTab(['#calculator', ''])" id="calculator">
+            <div class="container-xxl rounded bg-black bg-opacity-10 p-3 p-lg-4">
+                <div class="row g-3 g-lg-4">
 
-                <hr class="text-secondary mt-2">
+                    <!-- Inputs -->
+                    <div
+                        x-data="{
+                            debugView: false,
+                            get argumentsList() {
+                                return Object.keys($store.calculatorInput.args).sort()
+                            },
+                            get commands() {
+                                const { rounds, players, map_code, args, mods } = $store.calculatorInput;
+                                const flags = Object.keys(args).filter(item => args[item]).map(key => $store.arguments[key].shortcode).concat(mods);
 
-                <div x-show="!debugView" class="row g-3">
-                    <div class="col-md-6">
-                        <label for="input-rounds" class="form-label">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
-                                <path d="M3 0a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V3a3 3 0 0 0-3-3H3zm2.5 4a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM12 13.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM5.5 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM8 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
-                            </svg>
-                            Rounds
-                        </label>
-                        <input x-model.number="$store.calculatorInput.rounds" type="number" min="1" max="255" class="form-control bg-black bg-opacity-25 text-light border-dark" id="input-rounds">
-                    </div>
+                                let output = [
+                                    [`${rounds}`, `${players}`, ...flags].join(' ')
+                                ];
 
-                    <div class="col-md-6">
-                        <label for="input-players" class="form-label">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
-                                <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
-                            </svg>
-                            Players
-                        </label>
-                        <input x-model.number="$store.calculatorInput.players" type="number" min="1" max="4" class="form-control bg-black bg-opacity-25 text-light border-dark" id="input-players">
-                    </div>
+                                if (map_code)
+                                    output.push(map_code);
 
-                    <div class="col-12">
-                        <label for="input-map" class="form-label">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.598-.49L10.5.99 5.598.01a.5.5 0 0 0-.196 0l-5 1A.5.5 0 0 0 0 1.5v14a.5.5 0 0 0 .598.49l4.902-.98 4.902.98a.502.502 0 0 0 .196 0l5-1A.5.5 0 0 0 16 14.5V.5zM5 14.09V1.11l.5-.1.5.1v12.98l-.402-.08a.498.498 0 0 0-.196 0L5 14.09zm5 .8V1.91l.402.08a.5.5 0 0 0 .196 0L11 1.91v12.98l-.5.1-.5-.1z" />
-                            </svg>
-                            Map
-                        </label>
+                                return output;
+                            },
+                            get inputData() {
+                                return JSON.stringify($store.calculatorInput, null, 4);
+                            },
+                            get modsAsString() {
+                                return $store.calculatorInput.mods.join(' ');
+                            },
+                            modsToArray() {
+                                $store.calculatorInput.mods = this.$el.value.split(/[\s,]/).map(item => item.trim()).filter(item => item);
+                            },
+                            resetMapCode() {
+                                $store.calculatorInput.map_code = null;
+                                this.$el.blur();
+                            }
+                        }"
+                        class="col-12 col-lg-3">
 
-                        <div class="hstack">
-                            <select
-                                x-model="$store.calculatorInput.map_code"
-                                class="form-select bg-black bg-opacity-25 text-light border-dark"
-                                id="input-map">
+                        <div class="position-sticky" style="top: 1rem">
+                            <div class="d-flex justify-content-end mb-1 flex-grow-0 align-items-center">
+                                <h2 class="h5 mb-1 me-auto">Inputs</h2>
+                                <nav>
+                                    <button
+                                        x-on:click="debugView = !debugView"
+                                        x-bind:class="debugView ? 'active' : ''"
+                                        type="button"
+                                        class="btn btn-dark btn-sm"
+                                        title="CLI data"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="bottom">
 
-                                <option value selected hidden></option>
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
+                                            <path d="M5.854 4.854a.5.5 0 1 0-.708-.708l-3.5 3.5a.5.5 0 0 0 0 .708l3.5 3.5a.5.5 0 0 0 .708-.708L2.707 8l3.147-3.146zm4.292 0a.5.5 0 0 1 .708-.708l3.5 3.5a.5.5 0 0 1 0 .708l-3.5 3.5a.5.5 0 0 1-.708-.708L13.293 8l-3.147-3.146z" />
+                                        </svg>
+                                    </button>
+                                </nav>
+                            </div>
 
-                                <template x-for="code in $store.mapCodes">
-                                    <option class="bg-dark" x-bind:value="code" x-text="$store.mapTranslator(code)"></option>
-                                </template>
-                            </select>
+                            <hr class="text-secondary mt-2">
 
-                            <button x-on:click="resetMapCode()" class="btn btn-link link-secondary" type="button" title="Clear" data-bs-toggle="tooltip" data-bs-placement="bottom">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
-                                    <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="col-12">
-                        <label class="form-label">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
-                                <path d="M7 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zM0 12a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm7-1.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zm0-5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zM3 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 4.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
-                            </svg>
-                            Options
-                        </label>
-
-                        <template x-for="argument in argumentsList.sort()" :key="argument">
-                            <div class="hstack justify-content-between">
-                                <div x-id="['input-argument']" class="form-check form-switch">
-                                    <input
-                                        x-bind:id="$id('input-argument')"
-                                        x-model="$store.calculatorInput.args[argument]"
-                                        class="form-check-input"
-                                        type="checkbox"
-                                        role="switch">
-
-                                    <label
-                                        x-bind:for="$id('input-argument')"
-                                        x-text="humanize(argument)"
-                                        class="form-check-label">
+                            <div x-show="!debugView" class="row g-1 g-sm-2 g-xl-3">
+                                <div class="col-3 col-lg-6">
+                                    <label for="input-rounds" class="form-label">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                            <path d="M3 0a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V3a3 3 0 0 0-3-3H3zm2.5 4a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm8 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM12 13.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zM5.5 12a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zM8 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+                                        </svg>
+                                        Rounds
                                     </label>
+                                    <input x-model.number="$store.calculatorInput.rounds" type="number" min="1" max="255" class="form-control bg-black bg-opacity-25 text-light border-dark" id="input-rounds">
                                 </div>
 
-                                <kbd class="text-secondary" x-text="toFlags(argument)"></kbd>
+                                <div class="col-3 col-lg-6">
+                                    <label for="input-players" class="form-label">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                            <path d="M7 14s-1 0-1-1 1-4 5-4 5 3 5 4-1 1-1 1H7Zm4-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-5.784 6A2.238 2.238 0 0 1 5 13c0-1.355.68-2.75 1.936-3.72A6.325 6.325 0 0 0 5 9c-4 0-5 3-5 4s1 1 1 1h4.216ZM4.5 8a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+                                        </svg>
+                                        Players
+                                    </label>
+                                    <input x-model.number="$store.calculatorInput.players" type="number" min="1" max="4" class="form-control bg-black bg-opacity-25 text-light border-dark" id="input-players">
+                                </div>
+
+                                <div class="col-6 col-lg-12">
+                                    <label for="input-map" class="form-label">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.598-.49L10.5.99 5.598.01a.5.5 0 0 0-.196 0l-5 1A.5.5 0 0 0 0 1.5v14a.5.5 0 0 0 .598.49l4.902-.98 4.902.98a.502.502 0 0 0 .196 0l5-1A.5.5 0 0 0 16 14.5V.5zM5 14.09V1.11l.5-.1.5.1v12.98l-.402-.08a.498.498 0 0 0-.196 0L5 14.09zm5 .8V1.91l.402.08a.5.5 0 0 0 .196 0L11 1.91v12.98l-.5.1-.5-.1z" />
+                                        </svg>
+                                        Map
+                                    </label>
+
+                                    <div class="hstack">
+                                        <select
+                                            x-model="$store.calculatorInput.map_code"
+                                            class="form-select bg-black bg-opacity-25 text-light border-dark"
+                                            id="input-map">
+
+                                            <option value selected hidden></option>
+
+                                            <template x-for="code in $store.mapCodes">
+                                                <option class="bg-dark" x-bind:value="code" x-text="$store.mapTranslator(code)"></option>
+                                            </template>
+                                        </select>
+
+                                        <button x-on:click="resetMapCode()" class="btn btn-link link-secondary" type="button" title="Clear" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
+                                                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                            <path d="M7 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zM0 12a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm7-1.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zm0-5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zM3 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 4.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
+                                        </svg>
+                                        Options
+                                    </label>
+
+                                    <template x-for="argument in argumentsList" :key="argument">
+                                        <div class="hstack justify-content-between">
+                                            <div x-id="['input-argument']" class="form-check form-switch">
+                                                <input
+                                                    x-bind:id="$id('input-argument')"
+                                                    x-model="$store.calculatorInput.args[argument]"
+                                                    class="form-check-input"
+                                                    type="checkbox"
+                                                    role="switch">
+
+                                                <label
+                                                    x-text="$store.arguments[argument].readable_name"
+                                                    x-bind:for="$id('input-argument')"
+                                                    x-bind:title="$store.arguments[argument].exp"
+                                                    class="form-check-label">
+                                                </label>
+                                            </div>
+
+                                            <kbd class="text-secondary" title="Command-line flag" x-text="$store.arguments[argument].shortcode"></kbd>
+                                        </div>
+                                    </template>
+
+                                    <div x-show="!$store.calculatorInput.arguments" class="form-text">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+                                        </svg>
+                                        Default options
+                                    </div>
+
+                                    <div
+                                        x-show="$store.calculatorInput.arguments"
+                                        x-on:click="$store.resetArguments()"
+                                        role="button"
+                                        class="form-text link-secondary">
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M8 3a5 5 0 1 1-4.546 2.914.5.5 0 0 0-.908-.417A6 6 0 1 0 8 2v1z" />
+                                            <path d="M8 4.466V.534a.25.25 0 0 0-.41-.192L5.23 2.308a.25.25 0 0 0 0 .384l2.36 1.966A.25.25 0 0 0 8 4.466z" />
+                                        </svg>
+                                        Reset options
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <hr class="text-secondary mt-0">
+                                    <label for="input-mods" class="form-label small">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                            <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z" />
+                                        </svg>
+                                        Custom arguments
+                                    </label>
+
+                                    <input
+                                        x-bind:value="modsAsString"
+                                        x-on:change="modsToArray()"
+                                        type="text"
+                                        class="form-control form-control-sm bg-black bg-opacity-25 text-info border-dark"
+                                        id="input-mods"
+                                        spellcheck="false">
+
+                                    <div class="form-text">Space separated list</div>
+                                </div>
+
+                                <div class="col-12">
+                                    <button
+                                        x-on:click="$store.time.start = performance.now()"
+                                        py-click="run_calculator()"
+                                        class="btn btn-light w-100"
+                                        id="run"
+                                        type="button">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                            <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm2 .5v2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5zm0 4v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zM4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM4 12.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zM7.5 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM7 9.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm.5 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM10 6.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm.5 2.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-1z" />
+                                        </svg>
+                                        Calculate
+                                    </button>
+                                </div>
                             </div>
-                        </template>
 
-                        <div x-show="!$store.calculatorInput.arguments" class="form-text">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
-                                <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
-                            </svg>
-                            Default argument settings
+                            <div x-cloak x-show="debugView" class="row g-3">
+                                <div class="col-12">
+                                    <label class="form-label">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                            <path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm9.5 5.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zm-6.354-.354a.5.5 0 1 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2a.5.5 0 1 0-.708.708L4.793 6.5 3.146 8.146z" />
+                                        </svg>
+                                        <span x-text="commands.length === 1 ? 'Command' : 'Commands'"></span>
+                                    </label>
+
+                                    <div class="vstack gap-1">
+                                        <template x-for="command in commands">
+                                            <pre class="bg-black bg-opacity-25 text-light border-dark rounded mb-0 p-2 user-select-all"><code x-text="command" x-effect="command && hljs.highlightElement($el)" class="language-bash"></code></pre>
+                                        </template>
+                                    </div>
+                                </div>
+
+                                <div class="col-12">
+                                    <label class="form-label">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M2 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z" />
+                                        </svg>
+                                        Data object
+                                    </label>
+                                    <pre class="bg-black bg-opacity-25 text-light border-dark rounded mb-0 p-2"><code x-text="inputData" x-effect="inputData && hljs.highlightElement($el)" class="language-json"></code></pre>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-12">
-                        <hr class="text-secondary mt-0">
-                        <label for="input-mods" class="form-label small">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
-                                <path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z" />
-                            </svg>
-                            Custom arguments
-                        </label>
-
-                        <input
-                            x-bind:value="modsAsString"
-                            x-on:change="modsToArray()"
-                            type="text"
-                            class="form-control form-control-sm bg-black bg-opacity-25 text-info border-dark"
-                            id="input-mods"
-                            spellcheck="false">
-
-                        <div class="form-text">Space separated list</div>
-                    </div>
-
-                    <div class="col-12">
-                        <button
-                            py-click="run_calculator()"
-                            class="btn btn-light w-100"
-                            id="run"
-                            type="button">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
-                                <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm2 .5v2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5zm0 4v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zM4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM4 12.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zM7.5 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM7 9.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm.5 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM10 6.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm.5 2.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-1z" />
-                            </svg>
-                            Calculate
-                        </button>
-                    </div>
-                </div>
-
-                <div x-cloak x-show="debugView" class="row g-3">
-                    <div class="col-12">
-                        <label class="form-label">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
-                                <path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm9.5 5.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zm-6.354-.354a.5.5 0 1 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2a.5.5 0 1 0-.708.708L4.793 6.5 3.146 8.146z" />
-                            </svg>
-                            <span x-text="commands.length === 1 ? 'Command' : 'Commands'"></span>
-                        </label>
-
-                        <div class="vstack gap-1">
-                            <template x-for="command in commands">
-                                <pre class="bg-black bg-opacity-25 text-light border-dark rounded p-2 mb-0 user-select-all"><kbd class="me-2 text-secondary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-chevron-compact-right" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M6.776 1.553a.5.5 0 0 1 .671.223l3 6a.5.5 0 0 1 0 .448l-3 6a.5.5 0 1 1-.894-.448L9.44 8 6.553 2.224a.5.5 0 0 1 .223-.671z"/></svg></kbd><code x-text="command"></code></pre>
-                            </template>
-                        </div>
-                    </div>
-
-                    <div class="col-12">
-                        <label class="form-label">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M2 12.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z" />
-                            </svg>
-                            Data object
-                        </label>
-                        <pre class="bg-black bg-opacity-25 text-light border-dark rounded p-2 mb-0"><code x-text="inputData"></code></pre>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Outputs -->
-            <div
-                x-data="{
-                    debugView: false,
-                    get debugData() {
-                        const data = $store.calculatorOutput ?? {};
-
-                        return Object.keys(data).length || data.length
-                            ? JSON.stringify(data, null, 4)
-                            : null;
-                    }
-                }"
-                class="col-9">
-
-                <div class="d-flex flex-column h-100">
-                    <div class="d-flex justify-content-end mb-1 flex-grow-0 align-items-center">
-                        <h2 class="h5 mb-1 me-auto">Results</h2>
-                        <nav class="btn-group btn-group-sm">
-                            <button
-                                x-on:click="debugView = false"
-                                x-bind:class="!debugView ? 'active' : ''"
-                                type="button"
-                                class="btn btn-light"
-                                title="View"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="bottom">
-
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
-                                    <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
-                                </svg>
-                            </button>
-
-                            <button
-                                x-on:click="debugView = true"
-                                x-bind:class="debugView ? 'active' : ''"
-                                type="button"
-                                class="btn btn-light"
-                                title="Data"
-                                data-bs-toggle="tooltip"
-                                data-bs-placement="bottom">
-
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
-                                    <path d="M2.114 8.063V7.9c1.005-.102 1.497-.615 1.497-1.6V4.503c0-1.094.39-1.538 1.354-1.538h.273V2h-.376C3.25 2 2.49 2.759 2.49 4.352v1.524c0 1.094-.376 1.456-1.49 1.456v1.299c1.114 0 1.49.362 1.49 1.456v1.524c0 1.593.759 2.352 2.372 2.352h.376v-.964h-.273c-.964 0-1.354-.444-1.354-1.538V9.663c0-.984-.492-1.497-1.497-1.6zM13.886 7.9v.163c-1.005.103-1.497.616-1.497 1.6v1.798c0 1.094-.39 1.538-1.354 1.538h-.273v.964h.376c1.613 0 2.372-.759 2.372-2.352v-1.524c0-1.094.376-1.456 1.49-1.456V7.332c-1.114 0-1.49-.362-1.49-1.456V4.352C13.51 2.759 12.75 2 11.138 2h-.376v.964h.273c.964 0 1.354.444 1.354 1.538V6.3c0 .984.492 1.497 1.497 1.6z" />
-                                </svg>
-                            </button>
-                        </nav>
-                    </div>
-
-                    <!-- View -->
+                    <!-- Outputs -->
                     <div
-                        x-show="!debugView"
-                        class="rounded border border-secondary p-3 font-monospace flex-grow-1">
+                        x-data="{
+                            debugView: false,
+                            get debugData() {
+                                const data = $store.calculatorOutput ?? {};
 
-                        <ul id="output-list" class="list-unstyled mb-0"></ul>
+                                return Object.keys(data).length || data.length
+                                    ? JSON.stringify(data, null, 4)
+                                    : null;
+                            },
+                            get data() {
+                                return $store.calculatorOutput ?? [];
+                            },
+                            get error() {
+                                const validTypes = ['round_time', 'perfect_time', 'mod'];
+                                const firstData = this.data.at(0);
 
+                                if (!firstData || !firstData.type)
+                                    return false;
+
+                                return firstData.type === 'error' || !validTypes.includes(firstData.type);
+                            }
+                        }"
+                        class="col-12 col-lg-9">
+
+                        <div class="d-flex flex-column h-100">
+                            <div class="d-flex justify-content-end mb-1 flex-grow-0 align-items-center">
+                                <h2 class="h5 mb-1 me-auto">Results</h2>
+
+                                <small x-cloak x-show="data.length" class="me-2 text-secondary" title="Generation time">
+                                    <span x-show="$store.time.loading" class="spinner-border spinner-border-sm" role="status" aria-label="Loading..."></span>
+                                    <span x-show="!$store.time.loading" x-text="$store.time.total"></span>
+                                </small>
+
+                                <nav class="btn-group btn-group-sm">
+                                    <button
+                                        x-on:click="debugView = false"
+                                        x-bind:class="!debugView ? 'active' : ''"
+                                        type="button"
+                                        class="btn btn-light"
+                                        title="View"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="bottom">
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z" />
+                                        </svg>
+                                    </button>
+
+                                    <button
+                                        x-on:click="debugView = true"
+                                        x-bind:class="debugView ? 'active' : ''"
+                                        type="button"
+                                        class="btn btn-light"
+                                        title="Data"
+                                        data-bs-toggle="tooltip"
+                                        data-bs-placement="bottom">
+
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
+                                            <path d="M2.114 8.063V7.9c1.005-.102 1.497-.615 1.497-1.6V4.503c0-1.094.39-1.538 1.354-1.538h.273V2h-.376C3.25 2 2.49 2.759 2.49 4.352v1.524c0 1.094-.376 1.456-1.49 1.456v1.299c1.114 0 1.49.362 1.49 1.456v1.524c0 1.593.759 2.352 2.372 2.352h.376v-.964h-.273c-.964 0-1.354-.444-1.354-1.538V9.663c0-.984-.492-1.497-1.497-1.6zM13.886 7.9v.163c-1.005.103-1.497.616-1.497 1.6v1.798c0 1.094-.39 1.538-1.354 1.538h-.273v.964h.376c1.613 0 2.372-.759 2.372-2.352v-1.524c0-1.094.376-1.456 1.49-1.456V7.332c-1.114 0-1.49-.362-1.49-1.456V4.352C13.51 2.759 12.75 2 11.138 2h-.376v.964h.273c.964 0 1.354.444 1.354 1.538V6.3c0 .984.492 1.497 1.497 1.6z" />
+                                        </svg>
+                                    </button>
+                                </nav>
+                            </div>
+
+                            <!-- View -->
+                            <div
+                                x-show="!debugView"
+                                class="rounded border border-dark flex-grow-1 overflow-hidden">
+
+                                <!-- Intro -->
+                                <template x-if="!data.length">
+                                    <div class="d-flex flex-column align-items-center justify-content-center text-center gap-2 h-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="text-primary" viewBox="0 0 16 16">
+                                            <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm2 .5v2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5zm0 4v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zM4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM4 12.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zM7.5 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM7 9.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm.5 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM10 6.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm.5 2.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-1z" />
+                                        </svg>
+                                        <h3 class="h5 mb-0">Welcome to ZM Round Calculator v2 by Zi0</h3>
+                                        <p class="text-secondary mb-0 col-lg-8">
+                                            Enter round number and amount of players and select optional arguments. Round and Players are mandatory, others are optional. Check <a class="text-decoration-none" target="_blank" rel="noopener external" href="https://github.com/Zi0MIX/ZM-RoundCalculator/blob/main/ARGUMENTS.MD">ARGUMENTS.MD on GitHub</a> for info.
+                                        </p>
+                                    </div>
+                                </template>
+
+                                <!-- Error -->
+                                <template x-if="error">
+                                    <div class="d-flex flex-column align-items-center justify-content-center text-center gap-2 h-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="text-danger" viewBox="0 0 16 16">
+                                            <path d="M11.46.146A.5.5 0 0 0 11.107 0H4.893a.5.5 0 0 0-.353.146L.146 4.54A.5.5 0 0 0 0 4.893v6.214a.5.5 0 0 0 .146.353l4.394 4.394a.5.5 0 0 0 .353.146h6.214a.5.5 0 0 0 .353-.146l4.394-4.394a.5.5 0 0 0 .146-.353V4.893a.5.5 0 0 0-.146-.353L11.46.146zM8 4c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995A.905.905 0 0 1 8 4zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" />
+                                        </svg>
+                                        <h3 class="h5 mb-0">An error occurred</h3>
+                                        <p class="text-secondary mb-0 col-lg-8">Please check your input for correctness or reload the page.</p>
+                                        <code class="text-danger" x-text="data[0].message">Error code</code>
+                                    </div>
+                                </template>
+
+                                <!-- Mods -->
+                                <template x-if="data[0]?.type === 'mod'">
+                                    <div class="d-flex flex-column align-items-center justify-content-center text-center gap-2 h-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="text-primary" viewBox="0 0 16 16">
+                                            <path fill-rule="evenodd" d="M1.114 8.063V7.9c1.005-.102 1.497-.615 1.497-1.6V4.503c0-1.094.39-1.538 1.354-1.538h.273V2h-.376C2.25 2 1.49 2.759 1.49 4.352v1.524c0 1.094-.376 1.456-1.49 1.456v1.299c1.114 0 1.49.362 1.49 1.456v1.524c0 1.593.759 2.352 2.372 2.352h.376v-.964h-.273c-.964 0-1.354-.444-1.354-1.538V9.663c0-.984-.492-1.497-1.497-1.6ZM14.886 7.9v.164c-1.005.103-1.497.616-1.497 1.6v1.798c0 1.094-.39 1.538-1.354 1.538h-.273v.964h.376c1.613 0 2.372-.759 2.372-2.352v-1.524c0-1.094.376-1.456 1.49-1.456v-1.3c-1.114 0-1.49-.362-1.49-1.456V4.352C14.51 2.759 13.75 2 12.138 2h-.376v.964h.273c.964 0 1.354.444 1.354 1.538V6.3c0 .984.492 1.497 1.497 1.6ZM7.5 11.5V9.207l-1.621 1.621-.707-.707L6.792 8.5H4.5v-1h2.293L5.172 5.879l.707-.707L7.5 6.792V4.5h1v2.293l1.621-1.621.707.707L9.208 7.5H11.5v1H9.207l1.621 1.621-.707.707L8.5 9.208V11.5h-1Z" />
+                                        </svg>
+                                        <h3 class="h5 mb-0">Custom mode</h3>
+                                        <p class="text-secondary mb-0 col-lg-8">See all results and details in the <a x-on:click="debugView = true" class="text-decoration-none" role="button">data view</a>.</p>
+                                    </div>
+                                </template>
+
+                                <!-- Content -->
+                                <template x-if="['round_time', 'perfect_time'].includes(data[0]?.type)">
+
+                                    <table
+                                        x-bind:class="!$store.calculatorInput.args.break ? 'table-sm': ''"
+                                        style="font-variant: tabular-nums"
+                                        class="table table-dark table-hover small fw-light mb-0">
+
+                                        <tbody>
+                                            <template x-for="item in data" :key="item.round">
+
+                                                <tr>
+                                                    <th>
+                                                        <kbd class="text-secondary" x-text="item.round"></kbd>
+                                                    </th>
+                                                    <template x-if="$store.calculatorInput.args.clear">
+                                                        <td>
+                                                            <strong class="text-info" x-text="item.time_output || item.readable_time"></strong>
+                                                        </td>
+                                                    </template>
+
+                                                    <template x-if="!$store.calculatorInput.args.clear && item.type === 'round_time'">
+                                                        <td>
+                                                            Round <strong class="text-info" x-text="item.round"></strong>
+                                                            will spawn in <strong class="text-info" x-text="item.time_output"></strong>
+                                                            and has <strong class="text-info" x-text="item.zombies"></strong> zombies.
+                                                            Spawnrate: <strong class="text-info" x-text="item.spawnrate"></strong>
+                                                            Network frame: <strong class="text-info" x-text="item.network_frame"></strong>.
+                                                        </td>
+                                                    </template>
+
+                                                    <template x-if="!$store.calculatorInput.args.clear && item.type === 'perfect_time'">
+                                                        <td>
+                                                            Perfect time to round <strong class="text-info" x-text="item.round"></strong>
+                                                            is <strong class="text-info" x-text="item.readable_time"></strong>
+                                                            on <strong class="text-info" x-text="item.map_name"></strong>.
+                                                        </td>
+                                                    </template>
+                                                </tr>
+
+                                            </template>
+                                        </tbody>
+
+                                    </table>
+
+                                </template>
+                            </div>
+
+                            <!-- Data -->
+                            <pre
+                                x-cloak
+                                x-show="debugView"
+                                class="bg-black bg-opacity-25 text-light border-dark flex-grow-1 rounded mb-0 p-2"><code x-text="debugData" x-effect="debugData && hljs.highlightElement($el)" class="language-json"></code><code id="debug" class="language-plaintext"></code></pre>
+
+                        </div>
                     </div>
-
-                    <!-- Data -->
-                    <pre
-                        x-cloak
-                        x-show="debugView"
-                        class="bg-black bg-opacity-25 text-light border-dark flex-grow-1 rounded p-2 mb-0"><code x-text="debugData"></code><code id="debug"></code></pre>
 
                 </div>
             </div>
+        </section>
 
-        </div>
-    </div>
+        <section x-show="currentTab(['#readme'])" id="readme">
+            <div class="container-xxl rounded bg-black bg-opacity-10 p-3 p-md-5">
+                <article class="col-xl-9 mx-auto" x-html="await getFile('https://raw.githubusercontent.com/Zi0MIX/ZM-RoundCalculator/main/README.MD')"></article>
+            </div>
+        </section>
+
+        <section x-show="currentTab(['#arguments'])" id="arguments">
+            <div class="container-xxl rounded bg-black bg-opacity-10 p-3 p-md-5">
+                <article class="col-xl-9 mx-auto" x-html="await getFile('https://raw.githubusercontent.com/Zi0MIX/ZM-RoundCalculator/main/ARGUMENTS.MD')"></article>
+            </div>
+        </section>
+    </main>
 
     <!-- Python -->
     <py-config type="json">
@@ -501,6 +700,12 @@
     </py-config>
 
     <py-script output="debug" src="calculator_run.py"></py-script>
+
+    <!--
+        TODO:
+        - smart view
+        - special rounds input [list of values] based on argument toggle option
+    -->
 
 </body>
 
