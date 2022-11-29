@@ -666,7 +666,11 @@ def calculator_handler(json_input: dict | None = None):
                 args.update({key: not all_arguments[key]["default_state"]})
     else:
         for key in args.keys():
-            args.update({key: json_input["args"][key]})
+            try:
+                args.update({key: json_input["args"][key]})
+            # The default state of the argument is already established, the error can be ignored
+            except KeyError:
+                continue
 
     # Define state of mods
     if json_input is None:
