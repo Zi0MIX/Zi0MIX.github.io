@@ -745,6 +745,7 @@ def calculator_handler(json_input: dict | None = None):
                 remembered_dog_average = 0.0
 
                 res = get_perfect_times(time_total, r + 1, map_code)
+                res["players"] = players
                 res["class_content"] = vars(zm_round)
                 res["special_average"] = remembered_dog_average
                 if is_dog_round:
@@ -759,6 +760,7 @@ def calculator_handler(json_input: dict | None = None):
 
         if not args["range"]:
             res = get_perfect_times(time_total, rnd, map_code)
+            res["players"] = players
             res["class_content"] = vars(zm_round)
             res["special_average"] = dog_rounds_average
             if is_dog_round:
