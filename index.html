@@ -37,9 +37,10 @@
                 rounds: null,
                 players: null,
                 map_code: null,
+                spec_rounds: [],
                 args: {},
                 mods: [],
-                get arguments() {
+                get use_arguments() {
                     const allArguments = Alpine.store('arguments');
                     const inputArguments = Object.entries(this.args);
                     return !inputArguments.length || inputArguments.some(([key, value]) => allArguments[key].default_state !== value);
@@ -48,8 +49,7 @@
 
             Alpine.store('resetArguments', () => {
                 const allArguments = Object.entries(Alpine.store('arguments'));
-                const webArguments = allArguments.filter(([key, item]) => item.use_in_web);
-                const defaultStates = webArguments.map(([key, item]) => [key, item.default_state]);
+                const defaultStates = allArguments.map(([key, item]) => [key, item.default_state]);
                 Alpine.store('calculatorInput').args = Object.fromEntries(defaultStates);
             });
 
@@ -66,6 +66,7 @@
         :root {
             --bs-font-sans-serif: "Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
             --bs-font-monospace: "Space Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            --bs-code-color: var(--bs-info);
         }
 
         ::-moz-selection {
@@ -178,7 +179,7 @@
             visibility: hidden;
             color: visible;
             opacity: 1;
-            z-index: 1000;
+            z-index: 2000;
         }
 
         .py-overlay {
@@ -195,10 +196,25 @@
             padding: 0 !important;
         }
 
+        @media (max-width: 575.98px) {
+            .table-fixed {
+                table-layout: fixed;
+            }
+        }
+
         .table-dark {
             --bs-table-color: var(--bs-gray-500);
             --bs-table-bg: rgba(0, 0, 0, .25);
             --bs-table-border-color: var(--bs-gray-900);
+        }
+
+        .css-content::before {
+            content: attr(data-index);
+        }
+
+        .navbar-blur {
+            background: rgba(var(--bs-dark-rgb), .65);
+            backdrop-filter: blur(33px);
         }
 
     </style>
@@ -225,6 +241,11 @@
     <main
         x-data="{
             hash: location.hash,
+            remotePages: {
+                readme: 'https://raw.githubusercontent.com/Zi0MIX/ZM-RoundCalculator/main/README.MD',
+                arguments: 'https://raw.githubusercontent.com/Zi0MIX/ZM-RoundCalculator/main/ARGUMENTS.MD',
+                api: 'https://raw.githubusercontent.com/Zi0MIX/ZM-RoundCalculator/main/API.MD'
+            },
             currentTab(tabs) {
                 return tabs.includes(this.hash);
             },
@@ -238,8 +259,8 @@
 
                 const classMap = {
                     a: 'text-decoration-none',
-                    code: 'text-info',
-                    table: 'table table-dark'
+                    table: 'table table-dark rounded overflow-hidden table-fixed',
+                    pre: 'bg-black bg-opacity-25 text-light border-dark rounded p-2'
                 };
 
                 const bindings = Object.keys(classMap).map(key => ({
@@ -258,24 +279,30 @@
         }"
         x-on:hashchange.window="hash = location.hash">
 
-        <nav class="nav justify-content-center mb-2">
-            <a x-bind:class="activeTab('')" class="nav-link link-secondary" href="#calculator">
+        <nav class="nav justify-content-center mb-1 py-2 sticky-top navbar-blur flex-nowrap">
+            <a x-bind:class="activeTab('')" x-on:click="window.scrollTo(0, 0)" class="nav-link link-secondary text-truncate" href="#calculator">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
                     <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2zm2 .5v2a.5.5 0 0 0 .5.5h7a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-7a.5.5 0 0 0-.5.5zm0 4v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zM4.5 9a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM4 12.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zM7.5 6a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM7 9.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm.5 2.5a.5.5 0 0 0-.5.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1zM10 6.5v1a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5zm.5 2.5a.5.5 0 0 0-.5.5v4a.5.5 0 0 0 .5.5h1a.5.5 0 0 0 .5-.5v-4a.5.5 0 0 0-.5-.5h-1z" />
                 </svg>
                 Calculator
             </a>
-            <a x-bind:class="activeTab()" class="nav-link link-secondary" href="#readme">
+            <a x-bind:class="activeTab()" x-on:click="window.scrollTo(0, 0)" class="nav-link link-secondary text-truncate" href="#readme">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
                     <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z" />
                 </svg>
                 Readme
             </a>
-            <a x-bind:class="activeTab()" class="nav-link link-secondary" href="#arguments">
+            <a x-bind:class="activeTab()" x-on:click="window.scrollTo(0, 0)" class="nav-link link-secondary text-truncate" href="#arguments">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
                     <path d="M7 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zM0 12a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm7-1.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5v-1zm0-5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zM3 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm0 4.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z" />
                 </svg>
                 Arguments
+            </a>
+            <a x-bind:class="activeTab()" x-on:click="window.scrollTo(0, 0)" class="nav-link link-secondary text-truncate" href="#api">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                    <path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm9.5 5.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zm-6.354-.354a.5.5 0 1 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2a.5.5 0 1 0-.708.708L4.793 6.5 3.146 8.146z" />
+                </svg>
+                API
             </a>
         </nav>
 
@@ -287,8 +314,11 @@
                     <div
                         x-data="{
                             debugView: false,
-                            get argumentsList() {
-                                return Object.keys($store.calculatorInput.args).sort()
+                            get webArguments() {
+                                return Object.keys($store.calculatorInput.args).filter(key => $store.arguments[key].use_in_web).sort();
+                            },
+                            get requireMap() {
+                                return Object.entries($store.calculatorInput.args).some(([key, value]) => value && $store.arguments[key].require_map);
                             },
                             get commands() {
                                 const { rounds, players, map_code, args, mods } = $store.calculatorInput;
@@ -306,6 +336,12 @@
                             get inputData() {
                                 return JSON.stringify($store.calculatorInput, null, 4);
                             },
+                            get specialRoundsAsString() {
+                                return $store.calculatorInput.spec_rounds.join(' ');
+                            },
+                            specialRoundsToArray() {
+                                $store.calculatorInput.spec_rounds = this.$el.value.split(/[\s,]/).map(item => +item.trim()).filter(item => item);
+                            },
                             get modsAsString() {
                                 return $store.calculatorInput.mods.join(' ');
                             },
@@ -321,7 +357,7 @@
 
                         <div class="position-sticky" style="top: 1rem">
                             <div class="d-flex justify-content-end mb-1 flex-grow-0 align-items-center">
-                                <h2 class="h5 mb-1 me-auto">Inputs</h2>
+                                <h2 class="h5 mb-0 me-auto">Inputs</h2>
                                 <nav>
                                     <button
                                         x-on:click="debugView = !debugView"
@@ -341,7 +377,7 @@
 
                             <hr class="text-secondary mt-2">
 
-                            <div x-show="!debugView" class="row g-1 g-sm-2 g-xl-3">
+                            <div x-show="!debugView" class="row g-1 g-sm-2">
                                 <div class="col-3 col-lg-6">
                                     <label for="input-rounds" class="form-label">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
@@ -363,7 +399,7 @@
                                 </div>
 
                                 <div class="col-6 col-lg-12">
-                                    <label for="input-map" class="form-label">
+                                    <label x-bind:class="!requireMap ? 'opacity-50' : ''" for="input-map" class="form-label">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
                                             <path fill-rule="evenodd" d="M16 .5a.5.5 0 0 0-.598-.49L10.5.99 5.598.01a.5.5 0 0 0-.196 0l-5 1A.5.5 0 0 0 0 1.5v14a.5.5 0 0 0 .598.49l4.902-.98 4.902.98a.502.502 0 0 0 .196 0l5-1A.5.5 0 0 0 16 14.5V.5zM5 14.09V1.11l.5-.1.5.1v12.98l-.402-.08a.498.498 0 0 0-.196 0L5 14.09zm5 .8V1.91l.402.08a.5.5 0 0 0 .196 0L11 1.91v12.98l-.5.1-.5-.1z" />
                                         </svg>
@@ -372,18 +408,27 @@
 
                                     <div class="hstack">
                                         <select
+                                            x-bind:disabled="!requireMap"
+                                            x-bind:class="!requireMap ? 'opacity-50' : ''"
                                             x-model="$store.calculatorInput.map_code"
                                             class="form-select bg-black bg-opacity-25 text-light border-dark"
                                             id="input-map">
 
                                             <option value selected hidden></option>
 
-                                            <template x-for="code in $store.mapCodes">
+                                            <template x-for="code in $store.mapCodes" :key="code">
                                                 <option class="bg-dark" x-bind:value="code" x-text="$store.mapTranslator(code)"></option>
                                             </template>
                                         </select>
 
-                                        <button x-on:click="resetMapCode()" class="btn btn-link link-secondary" type="button" title="Clear" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                        <button
+                                            x-bind:disabled="!requireMap"
+                                            x-on:click="resetMapCode()"
+                                            class="btn btn-link link-secondary"
+                                            type="button"
+                                            title="Clear"
+                                            data-bs-toggle="tooltip"
+                                            data-bs-placement="bottom">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
                                                 <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z" />
                                             </svg>
@@ -399,7 +444,7 @@
                                         Options
                                     </label>
 
-                                    <template x-for="argument in argumentsList" :key="argument">
+                                    <template x-for="argument in webArguments" :key="argument">
                                         <div class="hstack justify-content-between">
                                             <div x-id="['input-argument']" class="form-check form-switch">
                                                 <input
@@ -421,7 +466,7 @@
                                         </div>
                                     </template>
 
-                                    <div x-show="!$store.calculatorInput.arguments" class="form-text">
+                                    <div x-show="!$store.calculatorInput.use_arguments" class="form-text">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
                                             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
                                         </svg>
@@ -429,7 +474,7 @@
                                     </div>
 
                                     <div
-                                        x-show="$store.calculatorInput.arguments"
+                                        x-show="$store.calculatorInput.use_arguments"
                                         x-on:click="$store.resetArguments()"
                                         role="button"
                                         class="form-text link-secondary">
@@ -440,6 +485,26 @@
                                         </svg>
                                         Reset options
                                     </div>
+                                </div>
+
+                                <div x-cloak x-show="$store.calculatorInput.args.special_rounds" class="col-12">
+                                    <label for="input-special-rounds" class="form-label">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
+                                            <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z" />
+                                        </svg>
+                                        Special rounds
+                                    </label>
+
+                                    <textarea
+                                        x-bind:value="specialRoundsAsString"
+                                        x-on:change="specialRoundsToArray()"
+                                        class="form-control form-control-sm bg-black bg-opacity-25 text-light border-dark"
+                                        id="input-special-rounds"
+                                        rows="3"
+                                        spellcheck="false">
+                                    </textarea>
+
+                                    <div class="form-text">Space or comma separated list</div>
                                 </div>
 
                                 <div class="col-12">
@@ -459,7 +524,7 @@
                                         id="input-mods"
                                         spellcheck="false">
 
-                                    <div class="form-text">Space separated list</div>
+                                    <div class="form-text">Space or comma separated list</div>
                                 </div>
 
                                 <div class="col-12">
@@ -487,7 +552,7 @@
                                     </label>
 
                                     <div class="vstack gap-1">
-                                        <template x-for="command in commands">
+                                        <template x-for="(command, i) in commands" :key="i">
                                             <pre class="bg-black bg-opacity-25 text-light border-dark rounded mb-0 p-2 user-select-all"><code x-text="command" x-effect="command && hljs.highlightElement($el)" class="language-bash"></code></pre>
                                         </template>
                                     </div>
@@ -510,6 +575,7 @@
                     <div
                         x-data="{
                             debugView: false,
+                            copyIcon: true,
                             get debugData() {
                                 const data = $store.calculatorOutput ?? {};
 
@@ -521,25 +587,87 @@
                                 return $store.calculatorOutput ?? [];
                             },
                             get error() {
-                                const validTypes = ['round_time', 'perfect_time', 'mod'];
+                                const validTypes = ['round_time', 'perfect_times', 'mod'];
                                 const firstData = this.data.at(0);
 
                                 if (!firstData || !firstData.type)
                                     return false;
 
                                 return firstData.type === 'error' || !validTypes.includes(firstData.type);
+                            },
+                            async copyResults() {
+                                const tooltip = bootstrap.Tooltip.getInstance(this.$el);
+                                this.copyIcon = !this.copyIcon;
+                                tooltip.setContent({ '.tooltip-inner': 'Copied!' });
+                                window.getSelection().selectAllChildren(this.debugView ? $refs.debug : $refs.content);
+                                const content = window.getSelection().toString().trim();
+                                await navigator.clipboard.writeText(content);
+
+                                setTimeout(() => {
+                                    this.copyIcon = !this.copyIcon;
+                                    tooltip.setContent({ '.tooltip-inner': 'Copy' });
+                                    this.$el.blur();
+                                }, 1000);
+                            },
+                            downloadResults() {
+                                window.getSelection().selectAllChildren(this.debugView ? $refs.debug : $refs.content);
+                                const content = window.getSelection().toString().trim();
+                                const addZero = number => number.toString().padStart(2, '0');
+                                const date = new Date();
+                                const year = date.getFullYear();
+                                const month = addZero(date.getMonth() + 1);
+                                const day = addZero(date.getDate());
+                                const hour = addZero(date.getHours());
+                                const minute = addZero(date.getMinutes());
+                                const second = addZero(date.getSeconds());
+
+                                window.getSelection().removeAllRanges();
+                                blob = new Blob([content], { type: this.debugView ? 'application/json' : 'text/plain' });
+
+                                $refs.download.href = URL.createObjectURL(blob);
+                                $refs.download.download = `zm_round_calculator_${year}-${month}-${day}_${hour}-${minute}-${second}`;
+                                $refs.download.click();
+                            },
+                            viewMode(type) {
+                                const clearOutput = $store.calculatorInput.args.clear;
+
+                                return {
+                                    mod: type === 'mod',
+                                    clear: clearOutput && type !== 'mod',
+                                    round: !clearOutput && type === 'round_time',
+                                    perfect: !clearOutput && type === 'perfect_times'
+                                };
                             }
                         }"
                         class="col-12 col-lg-9">
 
                         <div class="d-flex flex-column h-100">
-                            <div class="d-flex justify-content-end mb-1 flex-grow-0 align-items-center">
-                                <h2 class="h5 mb-1 me-auto">Results</h2>
+                            <div class="hstack mb-1 flex-grow-0 gap-2">
+                                <h2 class="h5 mb-0 me-auto">Results</h2>
 
-                                <small x-cloak x-show="data.length" class="me-2 text-secondary" title="Generation time">
+                                <small x-cloak x-show="data.length" class="text-secondary" title="Generation time">
                                     <span x-show="$store.time.loading" class="spinner-border spinner-border-sm" role="status" aria-label="Loading..."></span>
                                     <span x-show="!$store.time.loading" x-text="$store.time.total"></span>
                                 </small>
+
+                                <div x-cloak x-show="data.length" class="btn-group btn-group-sm">
+                                    <button x-on:click.throttle.1000ms="copyResults()" x-bind:class="copyIcon ? 'btn-dark' : 'btn-success'" class="btn btn-sm" type="button" title="Copy" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                        <svg x-show="copyIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
+                                            <path d="M13 0H6a2 2 0 0 0-2 2 2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h7a2 2 0 0 0 2-2 2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm0 13V4a2 2 0 0 0-2-2H5a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1zM3 4a1 1 0 0 1 1-1h7a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4z" />
+                                        </svg>
+
+                                        <svg x-cloak x-show="!copyIcon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
+                                            <path d="M13.854 3.646a.5.5 0 0 1 0 .708l-7 7a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L6.5 10.293l6.646-6.647a.5.5 0 0 1 .708 0z" />
+                                        </svg>
+                                    </button>
+                                    <a x-ref="download" class="invisible" download></a>
+                                    <button x-on:click.debounce="downloadResults()" class="btn btn-sm btn-dark" type="button" title="Download" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi" viewBox="0 0 16 16">
+                                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                                        </svg>
+                                    </button>
+                                </div>
 
                                 <nav class="btn-group btn-group-sm">
                                     <button
@@ -574,6 +702,7 @@
 
                             <!-- View -->
                             <div
+                                x-ref="content"
                                 x-show="!debugView"
                                 class="rounded border border-dark flex-grow-1 overflow-hidden">
 
@@ -602,19 +731,8 @@
                                     </div>
                                 </template>
 
-                                <!-- Mods -->
-                                <template x-if="data[0]?.type === 'mod'">
-                                    <div class="d-flex flex-column align-items-center justify-content-center text-center gap-2 h-100">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="currentColor" class="text-primary" viewBox="0 0 16 16">
-                                            <path fill-rule="evenodd" d="M1.114 8.063V7.9c1.005-.102 1.497-.615 1.497-1.6V4.503c0-1.094.39-1.538 1.354-1.538h.273V2h-.376C2.25 2 1.49 2.759 1.49 4.352v1.524c0 1.094-.376 1.456-1.49 1.456v1.299c1.114 0 1.49.362 1.49 1.456v1.524c0 1.593.759 2.352 2.372 2.352h.376v-.964h-.273c-.964 0-1.354-.444-1.354-1.538V9.663c0-.984-.492-1.497-1.497-1.6ZM14.886 7.9v.164c-1.005.103-1.497.616-1.497 1.6v1.798c0 1.094-.39 1.538-1.354 1.538h-.273v.964h.376c1.613 0 2.372-.759 2.372-2.352v-1.524c0-1.094.376-1.456 1.49-1.456v-1.3c-1.114 0-1.49-.362-1.49-1.456V4.352C14.51 2.759 13.75 2 12.138 2h-.376v.964h.273c.964 0 1.354.444 1.354 1.538V6.3c0 .984.492 1.497 1.497 1.6ZM7.5 11.5V9.207l-1.621 1.621-.707-.707L6.792 8.5H4.5v-1h2.293L5.172 5.879l.707-.707L7.5 6.792V4.5h1v2.293l1.621-1.621.707.707L9.208 7.5H11.5v1H9.207l1.621 1.621-.707.707L8.5 9.208V11.5h-1Z" />
-                                        </svg>
-                                        <h3 class="h5 mb-0">Custom mode</h3>
-                                        <p class="text-secondary mb-0 col-lg-8">See all results and details in the <a x-on:click="debugView = true" class="text-decoration-none" role="button">data view</a>.</p>
-                                    </div>
-                                </template>
-
                                 <!-- Content -->
-                                <template x-if="['round_time', 'perfect_time'].includes(data[0]?.type)">
+                                <template x-if="['round_time', 'perfect_times', 'mod'].includes(data[0]?.type)">
 
                                     <table
                                         x-bind:class="!$store.calculatorInput.args.break ? 'table-sm': ''"
@@ -625,34 +743,47 @@
                                             <template x-for="item in data" :key="item.round">
 
                                                 <tr>
-                                                    <th>
-                                                        <kbd class="text-secondary" x-text="item.round"></kbd>
+                                                    <th style="width: 4em">
+                                                        <kbd class="text-secondary css-content" x-bind:data-index="item.round"></kbd>
                                                     </th>
-                                                    <template x-if="$store.calculatorInput.args.clear">
+
+                                                    <template x-if="viewMode(item.type).clear">
                                                         <td>
-                                                            <strong class="text-info" x-text="item.time_output || item.readable_time"></strong>
+                                                            <strong class="text-info" x-text="item.time_output"></strong>
                                                         </td>
                                                     </template>
 
-                                                    <template x-if="!$store.calculatorInput.args.clear && item.type === 'round_time'">
+                                                    <template x-if="viewMode(item.type).mod">
+                                                        <td>
+                                                            <samp x-text="item.message"></samp>
+                                                        </td>
+                                                    </template>
+
+                                                    <template x-if="viewMode(item.type).round">
                                                         <td>
                                                             Round <strong class="text-info" x-text="item.round"></strong>
                                                             will spawn in <strong class="text-info" x-text="item.time_output"></strong>
-                                                            and has <strong class="text-info" x-text="item.zombies"></strong> zombies.
+                                                            and has
+                                                            <span x-show="!$store.calculatorInput.args.hordes">
+                                                                <strong class="text-info" x-text="item.zombies"></strong> zombies.
+                                                            </span>
+                                                            <span x-show="$store.calculatorInput.args.hordes">
+                                                                <strong class="text-info" x-text="item.hordes"></strong> hordes.
+                                                            </span>
                                                             Spawnrate: <strong class="text-info" x-text="item.spawnrate"></strong>
                                                             Network frame: <strong class="text-info" x-text="item.network_frame"></strong>.
                                                         </td>
                                                     </template>
 
-                                                    <template x-if="!$store.calculatorInput.args.clear && item.type === 'perfect_time'">
+                                                    <template x-if="viewMode(item.type).perfect">
                                                         <td>
                                                             Perfect time to round <strong class="text-info" x-text="item.round"></strong>
-                                                            is <strong class="text-info" x-text="item.readable_time"></strong>
+                                                            is <strong class="text-info" x-text="item.time_output"></strong>
                                                             on <strong class="text-info" x-text="item.map_name"></strong>.
                                                         </td>
                                                     </template>
-                                                </tr>
 
+                                                </tr>
                                             </template>
                                         </tbody>
 
@@ -664,6 +795,7 @@
                             <!-- Data -->
                             <pre
                                 x-cloak
+                                x-ref="debug"
                                 x-show="debugView"
                                 class="bg-black bg-opacity-25 text-light border-dark flex-grow-1 rounded mb-0 p-2"><code x-text="debugData" x-effect="debugData && hljs.highlightElement($el)" class="language-json"></code><code id="debug" class="language-plaintext"></code></pre>
 
@@ -674,17 +806,16 @@
             </div>
         </section>
 
-        <section x-show="currentTab(['#readme'])" id="readme">
-            <div class="container-xxl rounded bg-black bg-opacity-10 p-3 p-md-5">
-                <article class="col-xl-9 mx-auto" x-html="await getFile('https://raw.githubusercontent.com/Zi0MIX/ZM-RoundCalculator/main/README.MD')"></article>
-            </div>
-        </section>
-
-        <section x-show="currentTab(['#arguments'])" id="arguments">
-            <div class="container-xxl rounded bg-black bg-opacity-10 p-3 p-md-5">
-                <article class="col-xl-9 mx-auto" x-html="await getFile('https://raw.githubusercontent.com/Zi0MIX/ZM-RoundCalculator/main/ARGUMENTS.MD')"></article>
-            </div>
-        </section>
+        <template x-for="page in Object.entries(remotePages)" :key="page[0]">
+            <section x-show="currentTab([`#${page[0]}`])" x-bind:id="page[0]">
+                <div class="container-xxl rounded bg-black bg-opacity-10 p-3 p-md-5">
+                    <article
+                        x-html="await getFile(page[1]), $nextTick(() => $el.querySelectorAll('[class*=language-]').forEach(node => hljs.highlightElement(node)))"
+                        class="col-xl-9 mx-auto">
+                    </article>
+                </div>
+            </section>
+        </template>
     </main>
 
     <!-- Python -->
@@ -702,9 +833,7 @@
     <py-script output="debug" src="calculator_run.py"></py-script>
 
     <!--
-        TODO:
-        - smart view
-        - special rounds input [list of values] based on argument toggle option
+        TODO: smart view
     -->
 
 </body>
