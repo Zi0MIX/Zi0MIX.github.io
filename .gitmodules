@@ -1,3 +1,4 @@
 [submodule "calculator"]
 	path = calculator
 	url = https://github.com/Zi0MIX/ZM-RoundCalculator
+	branch = main
