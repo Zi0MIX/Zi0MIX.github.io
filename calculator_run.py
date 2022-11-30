@@ -13,7 +13,7 @@ def export_data(data):
 
 def import_calculator() -> tuple:
     try:
-        from calculator.zm_calculator import main_api, map_translator, MAP_LIST, get_arguments, toggle_ownprint
+        from zm_calculator import main_api, map_translator, MAP_LIST, get_arguments, toggle_ownprint
         return (main_api, map_translator, MAP_LIST, get_arguments, toggle_ownprint)
     except ModuleNotFoundError as err:
         module_error = [{"type": "error", "message": str(err)}]
