@@ -13,8 +13,8 @@ def export_data(data):
 
 def import_calculator() -> tuple:
     try:
-        from zm_calculator import main_api, map_translator, MAP_LIST, get_arguments, toggle_ownprint
-        return (main_api, map_translator, MAP_LIST, get_arguments, toggle_ownprint)
+        from zm_calculator import main_api, map_translator, MAP_LIST, get_arguments
+        return (main_api, map_translator, MAP_LIST, get_arguments)
     except ModuleNotFoundError as err:
         module_error = [{"type": "error", "message": str(err)}]
         export_data(module_error)
@@ -24,9 +24,6 @@ def import_calculator() -> tuple:
 calculator = import_calculator()
 if not calculator:
     exit()
-
-# Disable OWN_PRINT
-calculator[4](False)
 
 # Assign imported components to globals available for this module
 main, map_translator, MAP_LIST, get_arguments = calculator[0], calculator[1], calculator[2], calculator[3]
