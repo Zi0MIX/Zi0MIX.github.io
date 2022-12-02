@@ -5,7 +5,7 @@ from pyodide.ffi import create_proxy, to_js
 
 # Exports Python to JavaScript console and Alpine.store()
 def export_data(data):
-    # console.log(str(data))
+    console.log(str(data))
     output = to_js(data, dict_converter = Object.fromEntries)
     Alpine.store('calculatorOutput', output)
     Alpine.store('time').end = performance.now()
