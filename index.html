@@ -322,7 +322,11 @@
                             },
                             get commands() {
                                 const { rounds, players, map_code, args, mods } = $store.calculatorInput;
-                                const flags = Object.keys(args).filter(item => args[item]).map(key => $store.arguments[key].shortcode).concat(mods);
+                                const flags = Object
+                                    .keys(args)
+                                    .filter(key => args[key] !== $store.arguments[key].default_state)
+                                    .map(key => $store.arguments[key].shortcode)
+                                    .concat(mods);
 
                                 let output = [
                                     [`${rounds}`, `${players}`, ...flags].join(' ')
