@@ -1,0 +1,1277 @@
+[
+    {
+        "round": 1,
+        "zombie_spawn_delay": 2.0,
+        "zombie_spawn_delay_str": "2.0"
+    },
+    {
+        "round": 2,
+        "zombie_spawn_delay": 1.899999976158142,
+        "zombie_spawn_delay_str": "1.9"
+    },
+    {
+        "round": 3,
+        "zombie_spawn_delay": 1.8049999475479126,
+        "zombie_spawn_delay_str": "1.805"
+    },
+    {
+        "round": 4,
+        "zombie_spawn_delay": 1.7147499322891235,
+        "zombie_spawn_delay_str": "1.71475"
+    },
+    {
+        "round": 5,
+        "zombie_spawn_delay": 1.6290124654769897,
+        "zombie_spawn_delay_str": "1.62901"
+    },
+    {
+        "round": 6,
+        "zombie_spawn_delay": 1.547561764717102,
+        "zombie_spawn_delay_str": "1.54756"
+    },
+    {
+        "round": 7,
+        "zombie_spawn_delay": 1.4701836109161377,
+        "zombie_spawn_delay_str": "1.47018"
+    },
+    {
+        "round": 8,
+        "zombie_spawn_delay": 1.396674394607544,
+        "zombie_spawn_delay_str": "1.39667"
+    },
+    {
+        "round": 9,
+        "zombie_spawn_delay": 1.3268406391143799,
+        "zombie_spawn_delay_str": "1.32684"
+    },
+    {
+        "round": 10,
+        "zombie_spawn_delay": 1.2604986429214478,
+        "zombie_spawn_delay_str": "1.2605"
+    },
+    {
+        "round": 11,
+        "zombie_spawn_delay": 1.1974736452102661,
+        "zombie_spawn_delay_str": "1.19747"
+    },
+    {
+        "round": 12,
+        "zombie_spawn_delay": 1.1375999450683594,
+        "zombie_spawn_delay_str": "1.1376"
+    },
+    {
+        "round": 13,
+        "zombie_spawn_delay": 1.0807199478149414,
+        "zombie_spawn_delay_str": "1.08072"
+    },
+    {
+        "round": 14,
+        "zombie_spawn_delay": 1.0266839265823364,
+        "zombie_spawn_delay_str": "1.02668"
+    },
+    {
+        "round": 15,
+        "zombie_spawn_delay": 0.9753497242927551,
+        "zombie_spawn_delay_str": "0.97535"
+    },
+    {
+        "round": 16,
+        "zombie_spawn_delay": 0.9265822172164917,
+        "zombie_spawn_delay_str": "0.926582"
+    },
+    {
+        "round": 17,
+        "zombie_spawn_delay": 0.8802530765533447,
+        "zombie_spawn_delay_str": "0.880253"
+    },
+    {
+        "round": 18,
+        "zombie_spawn_delay": 0.8362404108047485,
+        "zombie_spawn_delay_str": "0.83624"
+    },
+    {
+        "round": 19,
+        "zombie_spawn_delay": 0.7944284081459045,
+        "zombie_spawn_delay_str": "0.794428"
+    },
+    {
+        "round": 20,
+        "zombie_spawn_delay": 0.7547069787979126,
+        "zombie_spawn_delay_str": "0.754707"
+    },
+    {
+        "round": 21,
+        "zombie_spawn_delay": 0.7169716358184814,
+        "zombie_spawn_delay_str": "0.716972"
+    },
+    {
+        "round": 22,
+        "zombie_spawn_delay": 0.6811230182647705,
+        "zombie_spawn_delay_str": "0.681123"
+    },
+    {
+        "round": 23,
+        "zombie_spawn_delay": 0.6470668315887451,
+        "zombie_spawn_delay_str": "0.647067"
+    },
+    {
+        "round": 24,
+        "zombie_spawn_delay": 0.6147134900093079,
+        "zombie_spawn_delay_str": "0.614713"
+    },
+    {
+        "round": 25,
+        "zombie_spawn_delay": 0.5839778184890747,
+        "zombie_spawn_delay_str": "0.583978"
+    },
+    {
+        "round": 26,
+        "zombie_spawn_delay": 0.5547789335250854,
+        "zombie_spawn_delay_str": "0.554779"
+    },
+    {
+        "round": 27,
+        "zombie_spawn_delay": 0.5270400047302246,
+        "zombie_spawn_delay_str": "0.52704"
+    },
+    {
+        "round": 28,
+        "zombie_spawn_delay": 0.5006880164146423,
+        "zombie_spawn_delay_str": "0.500688"
+    },
+    {
+        "round": 29,
+        "zombie_spawn_delay": 0.47565361857414246,
+        "zombie_spawn_delay_str": "0.475654"
+    },
+    {
+        "round": 30,
+        "zombie_spawn_delay": 0.4518709182739258,
+        "zombie_spawn_delay_str": "0.451871"
+    },
+    {
+        "round": 31,
+        "zombie_spawn_delay": 0.42927736043930054,
+        "zombie_spawn_delay_str": "0.429277"
+    },
+    {
+        "round": 32,
+        "zombie_spawn_delay": 0.40781348943710327,
+        "zombie_spawn_delay_str": "0.407813"
+    },
+    {
+        "round": 33,
+        "zombie_spawn_delay": 0.3874228000640869,
+        "zombie_spawn_delay_str": "0.387423"
+    },
+    {
+        "round": 34,
+        "zombie_spawn_delay": 0.3680516481399536,
+        "zombie_spawn_delay_str": "0.368052"
+    },
+    {
+        "round": 35,
+        "zombie_spawn_delay": 0.3496490716934204,
+        "zombie_spawn_delay_str": "0.349649"
+    },
+    {
+        "round": 36,
+        "zombie_spawn_delay": 0.3321666121482849,
+        "zombie_spawn_delay_str": "0.332167"
+    },
+    {
+        "round": 37,
+        "zombie_spawn_delay": 0.3155582845211029,
+        "zombie_spawn_delay_str": "0.315558"
+    },
+    {
+        "round": 38,
+        "zombie_spawn_delay": 0.29978036880493164,
+        "zombie_spawn_delay_str": "0.29978"
+    },
+    {
+        "round": 39,
+        "zombie_spawn_delay": 0.28479135036468506,
+        "zombie_spawn_delay_str": "0.284791"
+    },
+    {
+        "round": 40,
+        "zombie_spawn_delay": 0.27055177092552185,
+        "zombie_spawn_delay_str": "0.270552"
+    },
+    {
+        "round": 41,
+        "zombie_spawn_delay": 0.2570241689682007,
+        "zombie_spawn_delay_str": "0.257024"
+    },
+    {
+        "round": 42,
+        "zombie_spawn_delay": 0.24417296051979065,
+        "zombie_spawn_delay_str": "0.244173"
+    },
+    {
+        "round": 43,
+        "zombie_spawn_delay": 0.23196430504322052,
+        "zombie_spawn_delay_str": "0.231964"
+    },
+    {
+        "round": 44,
+        "zombie_spawn_delay": 0.22036609053611755,
+        "zombie_spawn_delay_str": "0.220366"
+    },
+    {
+        "round": 45,
+        "zombie_spawn_delay": 0.20934778451919556,
+        "zombie_spawn_delay_str": "0.209348"
+    },
+    {
+        "round": 46,
+        "zombie_spawn_delay": 0.1988803893327713,
+        "zombie_spawn_delay_str": "0.19888"
+    },
+    {
+        "round": 47,
+        "zombie_spawn_delay": 0.18893636763095856,
+        "zombie_spawn_delay_str": "0.188936"
+    },
+    {
+        "round": 48,
+        "zombie_spawn_delay": 0.17948955297470093,
+        "zombie_spawn_delay_str": "0.17949"
+    },
+    {
+        "round": 49,
+        "zombie_spawn_delay": 0.17051507532596588,
+        "zombie_spawn_delay_str": "0.170515"
+    },
+    {
+        "round": 50,
+        "zombie_spawn_delay": 0.16198931634426117,
+        "zombie_spawn_delay_str": "0.161989"
+    },
+    {
+        "round": 51,
+        "zombie_spawn_delay": 0.15388984978199005,
+        "zombie_spawn_delay_str": "0.15389"
+    },
+    {
+        "round": 52,
+        "zombie_spawn_delay": 0.14619535207748413,
+        "zombie_spawn_delay_str": "0.146195"
+    },
+    {
+        "round": 53,
+        "zombie_spawn_delay": 0.13888558745384216,
+        "zombie_spawn_delay_str": "0.138886"
+    },
+    {
+        "round": 54,
+        "zombie_spawn_delay": 0.1319413036108017,
+        "zombie_spawn_delay_str": "0.131941"
+    },
+    {
+        "round": 55,
+        "zombie_spawn_delay": 0.12534423172473907,
+        "zombie_spawn_delay_str": "0.125344"
+    },
+    {
+        "round": 56,
+        "zombie_spawn_delay": 0.11907701939344406,
+        "zombie_spawn_delay_str": "0.119077"
+    },
+    {
+        "round": 57,
+        "zombie_spawn_delay": 0.11312316358089447,
+        "zombie_spawn_delay_str": "0.113123"
+    },
+    {
+        "round": 58,
+        "zombie_spawn_delay": 0.10746700316667557,
+        "zombie_spawn_delay_str": "0.107467"
+    },
+    {
+        "round": 59,
+        "zombie_spawn_delay": 0.1020936518907547,
+        "zombie_spawn_delay_str": "0.102094"
+    },
+    {
+        "round": 60,
+        "zombie_spawn_delay": 0.0969889685511589,
+        "zombie_spawn_delay_str": "0.096989"
+    },
+    {
+        "round": 61,
+        "zombie_spawn_delay": 0.09213951975107193,
+        "zombie_spawn_delay_str": "0.0921395"
+    },
+    {
+        "round": 62,
+        "zombie_spawn_delay": 0.08753254264593124,
+        "zombie_spawn_delay_str": "0.0875325"
+    },
+    {
+        "round": 63,
+        "zombie_spawn_delay": 0.08315591514110565,
+        "zombie_spawn_delay_str": "0.0831559"
+    },
+    {
+        "round": 64,
+        "zombie_spawn_delay": 0.07899811863899231,
+        "zombie_spawn_delay_str": "0.0789981"
+    },
+    {
+        "round": 65,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 66,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 67,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 68,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 69,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 70,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 71,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 72,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 73,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 74,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 75,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 76,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 77,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 78,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 79,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 80,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 81,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 82,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 83,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 84,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 85,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 86,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 87,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 88,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 89,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 90,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 91,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 92,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 93,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 94,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 95,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 96,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 97,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 98,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 99,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 100,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 101,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 102,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 103,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 104,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 105,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 106,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 107,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 108,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 109,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 110,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 111,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 112,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 113,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 114,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 115,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 116,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 117,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 118,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 119,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 120,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 121,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 122,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 123,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 124,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 125,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 126,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 127,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 128,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 129,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 130,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 131,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 132,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 133,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 134,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 135,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 136,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 137,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 138,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 139,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 140,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 141,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 142,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 143,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 144,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 145,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 146,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 147,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 148,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 149,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 150,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 151,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 152,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 153,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 154,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 155,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 156,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 157,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 158,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 159,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 160,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 161,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 162,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 163,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 164,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 165,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 166,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 167,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 168,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 169,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 170,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 171,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 172,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 173,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 174,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 175,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 176,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 177,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 178,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 179,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 180,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 181,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 182,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 183,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 184,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 185,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 186,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 187,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 188,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 189,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 190,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 191,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 192,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 193,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 194,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 195,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 196,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 197,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 198,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 199,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 200,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 201,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 202,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 203,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 204,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 205,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 206,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 207,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 208,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 209,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 210,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 211,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 212,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 213,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 214,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 215,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 216,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 217,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 218,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 219,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 220,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 221,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 222,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 223,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 224,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 225,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 226,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 227,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 228,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 229,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 230,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 231,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 232,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 233,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 234,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 235,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 236,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 237,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 238,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 239,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 240,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 241,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 242,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 243,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 244,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 245,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 246,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 247,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 248,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 249,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 250,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 251,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 252,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 253,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 254,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    },
+    {
+        "round": 255,
+        "zombie_spawn_delay": 0.07999999821186066,
+        "zombie_spawn_delay_str": "0.08"
+    }
+]
