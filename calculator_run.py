@@ -1,5 +1,4 @@
 from js import Alpine, Object, console, performance
-from sys import exit
 from pyodide.ffi import create_proxy, to_js
 
 
@@ -22,16 +21,16 @@ def import_calculator() -> tuple:
 
 
 calculator = import_calculator()
-if not calculator:
-    exit()
 
 # Assign imported components to globals available for this module
-main, map_translator, MAP_LIST, get_arguments = calculator[0], calculator[1], calculator[2], calculator[3]
+if calculator:
+    main, map_translator, map_list, argument_list = calculator
 
-# Expose calculator_web imports to Alpine
-Alpine.store('mapCodes', to_js(MAP_LIST))
-Alpine.store('mapTranslator', create_proxy(map_translator))
-Alpine.store('arguments', to_js(get_arguments(), dict_converter = Object.fromEntries))
+    # Expose calculator_web imports to Alpine
+    Alpine.store('mapCodes', to_js(map_list))
+    Alpine.store('mapTranslator', create_proxy(map_translator))
+    Alpine.store('arguments', to_js(argument_list(), dict_converter = Object.fromEntries))
+
 
 # Perform calculation and use Alpine.store() for I/O
 def run_calculator():
