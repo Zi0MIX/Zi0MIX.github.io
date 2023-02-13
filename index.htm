@@ -847,6 +847,16 @@
                                                         </td>
                                                     </template>
 
+                                                    <template x-if="$store.calculatorInput.args.insta_rounds && (viewMode(item.type).round || viewMode(item.type).perfect)">
+                                                        <td class="text-end">
+                                                            <span
+                                                                x-show="item.is_insta_round" class="badge bg-warning text-black fw-semibold rounded-pill"
+                                                                title="Insta Kill Round">
+                                                                Insta
+                                                            </span>
+                                                        </td>
+                                                    </template>
+
                                                 </tr>
                                             </template>
                                         </tbody>
