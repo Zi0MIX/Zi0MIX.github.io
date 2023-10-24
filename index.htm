@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 
 <head>
     <meta charset="utf-8">
@@ -16,8 +16,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/bootstrap@5/dist/css/bootstrap.min.css,gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" crossorigin>
 
     <script src="https://pyscript.net/latest/pyscript.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3/dist/cdn.min.js" crossorigin defer></script>
-    <script src="https://cdn.jsdelivr.net/combine/npm/alpinejs@3/dist/cdn.min.js,npm/bootstrap@5/dist/js/bootstrap.bundle.min.js,gh/highlightjs/cdn-release@11/build/highlight.min.js,npm/showdown@2/dist/showdown.min.js" crossorigin defer></script>
+    <script src="https://cdn.jsdelivr.net/combine/npm/@alpinejs/intersect@3/dist/cdn.min.js,npm/alpinejs@3/dist/cdn.min.js,npm/bootstrap@5/dist/js/bootstrap.bundle.min.js,gh/highlightjs/cdn-release@11/build/highlight.min.js,npm/showdown@2/dist/showdown.min.js" crossorigin defer></script>
 
     <script>
         document.addEventListener('alpine:init', () => {
@@ -69,21 +68,23 @@
             --bs-font-sans-serif: "Space Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
             --bs-font-monospace: "Space Mono", SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
             --bs-code-color: var(--bs-info);
+            --bs-btn-focus-shadow-rgb: 66, 70, 73;
+            --bs-heading-color: var(--bs-emphasis-color);
         }
 
         ::-moz-selection {
-            background: var(--bs-light);
-            color: var(--bs-dark);
+            background: var(--bs-body-color);
+            color: var(--bs-body-bg);
         }
 
         ::selection {
-            background: var(--bs-light);
-            color: var(--bs-dark);
+            background: var(--bs-body-color);
+            color: var(--bs-body-bg);
         }
 
         * {
             scrollbar-width: thin;
-            scrollbar-color: var(--bs-gray) rgba(0, 0, 0, .2);
+            scrollbar-color: var(--bs-tertiary-color) var(--bs-dark-bg-subtle);
         }
 
         ::-webkit-scrollbar,
@@ -98,12 +99,12 @@
         }
 
         ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, .2);
+            background: var(--bs-dark-bg-subtle);
             border-radius: .25rem;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: var(--bs-gray);
+            background: var(--bs-tertiary-color);
             background-clip: content-box;
             border: .125rem solid rgba(0, 0, 0, 0);
             border-radius: .25rem;
@@ -123,7 +124,8 @@
 
         .form-check-input:focus,
         .form-control:focus,
-        .form-select:focus {
+        .form-select:focus,
+        .nav-link:focus-visible {
             box-shadow: 0 0 0 .25rem rgba(var(--bs-btn-focus-shadow-rgb), .5);
         }
 
@@ -158,7 +160,7 @@
             text-align: center;
             width: 100%;
             display: block;
-            color: var(--bs-secondary);
+            color: var(--bs-tertiary-color);
             font-size: .875rem;
         }
 
@@ -176,7 +178,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(var(--bs-dark-rgb), .65);
+            background: rgba(var(--bs-body-bg-rgb), .65);
             backdrop-filter: blur(33px);
             transition: backdrop-filter 500ms, opacity 500ms;
             visibility: hidden;
@@ -235,6 +237,11 @@
             background: none;
         }
 
+        kbd {
+            color: var(--bs-tertiary-color);
+            background-color: var(--bs-tertiary-bg);
+        }
+
         pre code.hljs {
             padding: 0 !important;
         }
@@ -246,9 +253,9 @@
         }
 
         .table-dark {
-            --bs-table-color: var(--bs-gray-500);
-            --bs-table-bg: rgba(0, 0, 0, .25);
-            --bs-table-border-color: var(--bs-gray-900);
+            --bs-table-color: var(--bs-secondary-color);
+            --bs-table-bg: var(--bs-secondary-bg-subtle);
+            --bs-table-border-color: var(--bs-body-bg);
         }
 
         .css-content::before {
@@ -256,19 +263,19 @@
         }
 
         .navbar-blur {
-            background: rgba(var(--bs-dark-rgb), .65);
+            background: rgba(var(--bs-body-bg-rgb), .65);
             backdrop-filter: blur(33px);
         }
 
     </style>
 </head>
 
-<body class="text-bg-dark">
+<body>
 
     <header>
         <div class="container-xxl">
             <div class="my-3 my-lg-5 text-center">
-                <h1 class="display-5 fw-bold">ZM-Round-Calculator <span class="badge fs-5 fw-semibold text-bg-primary align-middle">Web UI</span></h1>
+                <h1 class="fw-bold">ZM-Round-Calculator <span class="badge fs-6 fw-semibold text-bg-primary align-middle">Web UI</span></h1>
                 <p class="lead">A program for calculating best possible round times for Black Ops 1 and Black Ops 2 zombies</p>
 
                 <a class="text-decoration-none" href="https://github.com/Zi0MIX/ZM-RoundCalculator" target="_blank" rel="noopener external">
@@ -303,7 +310,7 @@
                 const classMap = {
                     a: 'text-decoration-none',
                     table: 'table table-dark rounded overflow-hidden table-fixed',
-                    pre: 'bg-black bg-opacity-25 text-light border-dark rounded p-2'
+                    pre: 'bg-secondary-subtle border border-dark rounded p-2'
                 };
 
                 const bindings = Object.keys(classMap).map(key => ({
@@ -320,7 +327,8 @@
                 return converter.makeHtml(markdown);
             }
         }"
-        x-on:hashchange.window="hash = location.hash">
+        x-on:hashchange.window="hash = location.hash"
+        class="pb-3">
 
         <nav class="nav justify-content-around justify-content-sm-center mb-1 py-2 sticky-top navbar-blur flex-nowrap">
             <a x-bind:class="activeTab('')" x-on:click="window.scrollTo(0, 0)" class="nav-link link-secondary text-truncate" href="#calculator">
@@ -368,7 +376,7 @@
         </nav>
 
         <section x-show="currentTab(['#calculator', ''])" id="calculator">
-            <div class="container-xxl rounded bg-black bg-opacity-10 p-3 p-lg-4">
+            <div class="container-xxl rounded bg-dark-subtle p-3 p-lg-4">
                 <div class="row g-3 g-lg-4">
 
                     <!-- Inputs -->
@@ -413,12 +421,6 @@
                             modsToArray() {
                                 $store.calculatorInput.mods = this.$el.value.split(/[\s,]/).map(item => item.trim()).filter(item => item);
                             },
-                            get numberOfTeleports() {
-                                return $store.calculatorInput.teleports;
-                            },
-                            teleportsToValue() {
-                                $store.calculatorInput.teleports = this.$el.value;
-                            },
                             resetMapCode() {
                                 $store.calculatorInput.map_code = null;
                                 this.$el.blur();
@@ -456,7 +458,7 @@
                                         </svg>
                                         Rounds
                                     </label>
-                                    <input x-model.number="$store.calculatorInput.rounds" type="number" min="1" max="255" class="form-control bg-black bg-opacity-25 text-light border-dark" id="input-rounds">
+                                    <input x-model.number="$store.calculatorInput.rounds" type="number" min="1" max="255" class="form-control bg-secondary-subtle border-dark" id="input-rounds">
                                 </div>
 
                                 <div class="col-3 col-lg-6">
@@ -466,7 +468,7 @@
                                         </svg>
                                         Players
                                     </label>
-                                    <input x-model.number="$store.calculatorInput.players" type="number" min="1" max="4" class="form-control bg-black bg-opacity-25 text-light border-dark" id="input-players">
+                                    <input x-model.number="$store.calculatorInput.players" type="number" min="1" max="4" class="form-control bg-secondary-subtle border-dark" id="input-players">
                                 </div>
 
                                 <div class="col-6 col-lg-12">
@@ -482,7 +484,7 @@
                                             x-bind:disabled="!requireMap"
                                             x-bind:class="!requireMap ? 'opacity-50' : ''"
                                             x-model="$store.calculatorInput.map_code"
-                                            class="form-select bg-black bg-opacity-25 text-light border-dark"
+                                            class="form-select bg-secondary-subtle border-dark"
                                             id="input-map">
 
                                             <option value selected hidden></option>
@@ -533,7 +535,7 @@
                                                 </label>
                                             </div>
 
-                                            <kbd class="text-secondary" title="Command-line flag" x-text="$store.arguments[argument].shortcode"></kbd>
+                                            <kbd class="mb-1" title="Command-line flag" x-text="$store.arguments[argument].shortcode"></kbd>
                                         </div>
                                     </template>
 
@@ -569,7 +571,7 @@
                                     <textarea
                                         x-bind:value="specialRoundsAsString"
                                         x-on:change="specialRoundsToArray()"
-                                        class="form-control form-control-sm bg-black bg-opacity-25 text-light border-dark"
+                                        class="form-control form-control-sm bg-secondary-subtle border-dark"
                                         id="input-special-rounds"
                                         rows="3"
                                         spellcheck="false">
@@ -579,7 +581,7 @@
                                 </div>
 
                                 <div x-cloak x-show="$store.calculatorInput.args.teleports" class="col-12">
-                                    <label for="input-num-of-teleports" class="form-label">
+                                    <label for="input-teleports" class="form-label">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi me-1" viewBox="0 0 16 16">
                                             <path d="M7.657 6.247c.11-.33.576-.33.686 0l.645 1.937a2.89 2.89 0 0 0 1.829 1.828l1.936.645c.33.11.33.576 0 .686l-1.937.645a2.89 2.89 0 0 0-1.828 1.829l-.645 1.936a.361.361 0 0 1-.686 0l-.645-1.937a2.89 2.89 0 0 0-1.828-1.828l-1.937-.645a.361.361 0 0 1 0-.686l1.937-.645a2.89 2.89 0 0 0 1.828-1.828l.645-1.937zM3.794 1.148a.217.217 0 0 1 .412 0l.387 1.162c.173.518.579.924 1.097 1.097l1.162.387a.217.217 0 0 1 0 .412l-1.162.387A1.734 1.734 0 0 0 4.593 5.69l-.387 1.162a.217.217 0 0 1-.412 0L3.407 5.69A1.734 1.734 0 0 0 2.31 4.593l-1.162-.387a.217.217 0 0 1 0-.412l1.162-.387A1.734 1.734 0 0 0 3.407 2.31l.387-1.162zM10.863.099a.145.145 0 0 1 .274 0l.258.774c.115.346.386.617.732.732l.774.258a.145.145 0 0 1 0 .274l-.774.258a1.156 1.156 0 0 0-.732.732l-.258.774a.145.145 0 0 1-.274 0l-.258-.774a1.156 1.156 0 0 0-.732-.732L9.1 2.137a.145.145 0 0 1 0-.274l.774-.258c.346-.115.617-.386.732-.732L10.863.1z" />
                                         </svg>
@@ -587,14 +589,14 @@
                                     </label>
 
                                     <input
-                                        x-bind:value="numberOfTeleports"
-                                        x-on:change="teleportsToValue()"
-                                        class="form-control form-control-sm bg-black bg-opacity-25 text-light border-dark"
-                                        id="input-num-of-teleports"
+                                        x-model.number="$store.calculatorInput.teleports"
+                                        type="number"
+                                        min="0"
+                                        class="form-control form-control-sm bg-secondary-subtle border-dark"
+                                        id="input-teleports"
                                         spellcheck="false">
                                     </input>
                                 </div>
-
 
                                 <div class="col-12">
                                     <hr class="text-secondary mt-0">
@@ -609,7 +611,7 @@
                                         x-bind:value="modsAsString"
                                         x-on:change="modsToArray()"
                                         type="text"
-                                        class="form-control form-control-sm bg-black bg-opacity-25 text-info border-dark"
+                                        class="form-control form-control-sm bg-secondary-subtle text-info border-dark"
                                         id="input-mods"
                                         spellcheck="false">
 
@@ -642,7 +644,7 @@
 
                                     <div class="vstack gap-1">
                                         <template x-for="(command, i) in commands" :key="i">
-                                            <pre class="bg-black bg-opacity-25 text-light border-dark rounded mb-0 p-2 user-select-all"><code x-text="command" x-effect="command && hljs.highlightElement($el)" class="language-bash"></code></pre>
+                                            <pre class="bg-secondary-subtle border border-dark rounded mb-0 p-2 user-select-all"><code x-text="command" x-effect="command, delete $el.dataset.highlighted, hljs.highlightElement($el)" class="language-bash"></code></pre>
                                         </template>
                                     </div>
                                 </div>
@@ -654,7 +656,7 @@
                                         </svg>
                                         Data object
                                     </label>
-                                    <pre class="bg-black bg-opacity-25 text-light border-dark rounded mb-0 p-2"><code x-text="inputData" x-effect="inputData && hljs.highlightElement($el)" class="language-json"></code></pre>
+                                    <pre class="bg-secondary-subtle border border-dark rounded mb-0 p-2"><code x-text="inputData" x-effect="inputData, delete $el.dataset.highlighted, hljs.highlightElement($el)" class="language-json"></code></pre>
                                 </div>
                             </div>
                         </div>
@@ -833,7 +835,7 @@
 
                                                 <tr>
                                                     <th style="width: 4em">
-                                                        <kbd class="text-secondary css-content" x-bind:data-index="item.round"></kbd>
+                                                        <kbd class="css-content" x-bind:data-index="item.round"></kbd>
                                                     </th>
 
                                                     <template x-if="viewMode(item.type).clear">
@@ -896,8 +898,8 @@
                                 x-cloak
                                 x-ref="debug"
                                 x-show="debugView"
-                                class="bg-black bg-opacity-25 text-light border-dark flex-grow-1 rounded p-2">
-                                <pre class="mb-0"><code x-text="debugData" x-effect="debugData && hljs.highlightElement($el)" class="language-json"></code></pre>
+                                class="bg-secondary-subtle border border-dark flex-grow-1 rounded p-2">
+                                <pre class="mb-0"><code x-text="debugData" x-effect="debugData, delete $el.dataset.highlighted, hljs.highlightElement($el)" class="language-json"></code></pre>
                             </py-terminal>
 
                         </div>
@@ -909,7 +911,7 @@
 
         <template x-for="page in Object.entries(remotePages)" :key="page[0]">
             <section x-show="currentTab([`#${page[0]}`])" x-bind:id="page[0]">
-                <div class="container-xxl rounded bg-black bg-opacity-10 p-3 p-md-5">
+                <div class="container-xxl rounded bg-dark-subtle p-3 p-md-5">
                     <article
                         x-html="await getFile(page[1]), $nextTick(() => $el.querySelectorAll('[class*=language-]').forEach(node => hljs.highlightElement(node)))"
                         class="col-xl-9 mx-auto">
@@ -919,7 +921,7 @@
         </template>
 
         <section x-cloak x-show="currentTab(['#health'])" id="health">
-            <div class="container-xxl rounded bg-black bg-opacity-10 p-3 p-md-5">
+            <div class="container-xxl rounded bg-dark-subtle p-3 p-md-5">
 
                 <article
                     x-data="{
@@ -1007,8 +1009,8 @@
 
                     <div class="col-8 col-sm-6 col-md-4 col-lg-3 mx-auto my-4">
                         <div class="input-group">
-                            <label class="input-group-text" for="round-health">Round</label>
-                            <input x-model.number="roundInput" type="number" min="1" max="2147483647" class="form-control bg-black bg-opacity-25 text-light border-dark text-center" id="round-health">
+                            <label class="input-group-text border-dark" for="round-health">Round</label>
+                            <input x-model.number="roundInput" type="number" min="1" max="2147483647" class="form-control bg-secondary-subtle border-dark text-center" id="round-health">
 
                             <button
                                 x-on:click="resetRoundInput()"
@@ -1107,7 +1109,7 @@
         </section>
 
         <section x-cloak x-show="currentTab(['#spawns'])" id="spawns">
-            <div class="container-xxl rounded bg-black bg-opacity-10 p-3 p-md-5">
+            <div class="container-xxl rounded bg-dark-subtle p-3 p-md-5">
 
                 <article
                     x-data="{
@@ -1173,8 +1175,8 @@
 
                     <div class="col-8 col-sm-6 col-md-4 col-lg-3 mx-auto my-4">
                         <div class="input-group">
-                            <label class="input-group-text" for="round-spawn">Round</label>
-                            <input x-model.number="roundInput" type="number" min="1" max="2147483647" class="form-control bg-black bg-opacity-25 text-light border-dark text-center" id="round-spawn">
+                            <label class="input-group-text border-dark" for="round-spawn">Round</label>
+                            <input x-model.number="roundInput" type="number" min="1" max="2147483647" class="form-control bg-secondary-subtle border-dark text-center" id="round-spawn">
 
                             <button
                                 x-on:click="resetRoundInput()"
