@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" crossorigin>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/bootstrap@5/dist/css/bootstrap.min.css,gh/highlightjs/cdn-release@11/build/styles/github-dark.min.css" crossorigin>
 
-    <script src="https://pyscript.net/latest/pyscript.js" defer></script>
     <script src="https://cdn.jsdelivr.net/combine/npm/@alpinejs/intersect@3/dist/cdn.min.js,npm/alpinejs@3/dist/cdn.min.js,npm/bootstrap@5/dist/js/bootstrap.bundle.min.js,gh/highlightjs/cdn-release@11/build/highlight.min.js,npm/showdown@2/dist/showdown.min.js" crossorigin defer></script>
+    <script src="https://pyscript.net/latest/pyscript.js" defer></script>
 
     <script>
         document.addEventListener('alpine:init', () => {
@@ -59,7 +59,10 @@
 
         addEventListener('DOMContentLoaded', () => {
             const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
-            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+            const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => {
+                tooltipTriggerEl.dataset.bsTrigger = 'hover';
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
         });
     </script>
 
@@ -178,7 +181,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(var(--bs-body-bg-rgb), .65);
+            background: rgba(var(--bs-body-bg-rgb), .6);
             backdrop-filter: blur(33px);
             transition: backdrop-filter 500ms, opacity 500ms;
             visibility: hidden;
@@ -263,7 +266,7 @@
         }
 
         .navbar-blur {
-            background: rgba(var(--bs-body-bg-rgb), .65);
+            background: rgba(var(--bs-body-bg-rgb), .6);
             backdrop-filter: blur(33px);
         }
 
@@ -380,7 +383,7 @@
                 <div class="row g-3 g-lg-4">
 
                     <!-- Inputs -->
-                    <div
+                    <form
                         x-data="{
                             debugView: false,
                             get webArguments() {
@@ -426,7 +429,8 @@
                                 this.$el.blur();
                             }
                         }"
-                        class="col-12 col-lg-3">
+                        class="col-12 col-lg-3"
+                        autocomplete="off">
 
                         <div class="position-sticky" style="top: 1rem">
                             <div class="d-flex justify-content-end mb-1 flex-grow-0 align-items-center">
@@ -660,7 +664,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </form>
 
                     <!-- Outputs -->
                     <div
@@ -1007,7 +1011,7 @@
 
                     <h2 class="text-center">Zombies Health &amp; Insta Kill Rounds</h2>
 
-                    <div class="col-8 col-sm-6 col-md-4 col-lg-3 mx-auto my-4">
+                    <form class="col-8 col-sm-6 col-md-4 col-lg-3 mx-auto my-4" autocomplete="off">
                         <div class="input-group">
                             <label class="input-group-text border-dark" for="round-health">Round</label>
                             <input x-model.number="roundInput" type="number" min="1" max="2147483647" class="form-control bg-secondary-subtle border-dark text-center" id="round-health">
@@ -1032,7 +1036,7 @@
                                 <label class="form-check-label" for="toggle-format">Format numbers</label>
                             </div>
                         </div>
-                    </div>
+                    </form>
 
                     <div class="table-responsive">
                         <table style="font-variant: tabular-nums" class="table table-dark table-sm table-hover small fw-light rounded overflow-hidden mb-0">
@@ -1173,7 +1177,7 @@
 
                     <h2 class="text-center">Spawnrates</h2>
 
-                    <div class="col-8 col-sm-6 col-md-4 col-lg-3 mx-auto my-4">
+                    <form class="col-8 col-sm-6 col-md-4 col-lg-3 mx-auto my-4" autocomplete="off">
                         <div class="input-group">
                             <label class="input-group-text border-dark" for="round-spawn">Round</label>
                             <input x-model.number="roundInput" type="number" min="1" max="2147483647" class="form-control bg-secondary-subtle border-dark text-center" id="round-spawn">
@@ -1198,7 +1202,7 @@
                                 <label class="form-check-label" for="toggle-rounding">Round hundredth</label>
                             </div>
                         </div>
-                    </div>
+                    </form>
 
                     <div class="table-responsive">
                         <table style="font-variant: tabular-nums" class="table table-dark table-sm table-hover small fw-light rounded overflow-hidden mb-0">
